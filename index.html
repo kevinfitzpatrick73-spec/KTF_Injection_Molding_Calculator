@@ -1,54 +1,124 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Molding Calc">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
-<title>Molding Cycle Calculator</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#111827" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Molding Calc" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<title>Injection Molding Calculator</title>
 <style>
-:root{--bg:#f3f4f6;--card:#fff;--text:#111827;--muted:#6b7280;--border:#d1d5db;--accent:#2563eb;--good:#047857}
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
-.wrap{max-width:780px;margin:0 auto;padding:18px 14px 40px}h1{margin:8px 0 4px;font-size:1.8rem}.sub{margin:0 0 18px;color:var(--muted)}
-.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:16px;box-shadow:0 8px 22px rgba(0,0,0,.06)}
-.grid,.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}label{display:block;font-weight:650;margin-bottom:6px}.hint{display:block;color:var(--muted);font-size:.78rem;margin-top:4px}
-input{width:100%;font-size:1.1rem;padding:13px 12px;border:1px solid var(--border);border-radius:12px;background:#fff;color:var(--text);outline:none}input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
-.result{border:1px solid var(--border);border-radius:14px;padding:14px;background:#fafafa}.result .label{color:var(--muted);font-size:.82rem;margin-bottom:6px}.result .value{font-size:1.5rem;font-weight:750}.emphasis{grid-column:1/-1;background:#ecfdf5;border-color:#a7f3d0}.emphasis .value{color:var(--good)}
-button{border:0;border-radius:12px;padding:12px 16px;font-size:1rem;font-weight:700;background:#e5e7eb;color:var(--text);margin-top:14px}.formula{font-size:.85rem;color:var(--muted);line-height:1.5}footer{text-align:center;color:var(--muted);font-size:.8rem}
-@media(max-width:600px){.grid,.results{grid-template-columns:1fr}.wrap{padding:12px}.emphasis{grid-column:auto}}
+:root{--bg:#f3f4f6;--card:#fff;--text:#111827;--muted:#6b7280;--border:#d1d5db;--accent:#2563eb;--good:#047857;--warn:#92400e;--bad:#991b1b;--shadow:0 10px 25px rgba(0,0,0,.07)}
+*{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:840px;margin:0 auto;padding:18px 14px 40px} header{margin:4px 0 14px} h1{margin:0;font-size:1.8rem;line-height:1.15}.sub{margin:5px 0 0;color:var(--muted);font-size:.93rem}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 16px}.tab{border:1px solid var(--border);background:#fff;color:var(--text);padding:11px 8px;border-radius:12px;font-weight:750;font-size:.9rem;min-height:48px}.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.panel{display:none}.panel.active{display:block}.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}.section-title{font-size:1.12rem;font-weight:800;margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}label{display:block;font-weight:700;font-size:.92rem;margin-bottom:6px}.hint{display:block;color:var(--muted);font-size:.77rem;margin-top:4px;line-height:1.35}
+input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--border);border-radius:11px;background:#fff;color:var(--text);outline:none;min-height:46px}input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+.inline{display:flex;gap:8px;align-items:center}.inline>*{min-width:0}.unit{max-width:100px}.results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.result{border:1px solid var(--border);border-radius:13px;padding:13px;background:#fafafa}.result .label{color:var(--muted);font-size:.78rem;margin-bottom:5px}.result .value{font-size:1.45rem;font-weight:800;line-height:1.1;word-break:break-word}.result.emphasis{border-color:#a7f3d0;background:#ecfdf5}.result.emphasis .value{color:var(--good)}.result.warn{border-color:#fde68a;background:#fffbeb}.result.warn .value{color:var(--warn)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}button{appearance:none;border:0;border-radius:11px;padding:11px 15px;font-size:.95rem;font-weight:750;cursor:pointer;min-height:44px}.secondary{background:#e5e7eb;color:var(--text)}.toggle{display:flex;align-items:center;gap:9px;margin-top:4px;font-size:.9rem;font-weight:650}.toggle input{width:20px;height:20px;min-height:0}.note{font-size:.82rem;color:var(--muted);line-height:1.45;border-left:3px solid var(--border);padding-left:10px}.callout{padding:11px 12px;border-radius:11px;background:#eff6ff;border:1px solid #bfdbfe;font-size:.85rem;line-height:1.45}.warning{display:none;margin-top:10px;padding:10px 12px;border-radius:10px;background:#fef2f2;color:var(--bad);border:1px solid #fecaca;font-size:.88rem}.hidden{display:none!important}.full{grid-column:1/-1}footer{color:var(--muted);font-size:.78rem;text-align:center;padding-top:8px}
+@media(max-width:650px){.grid,.results{grid-template-columns:1fr}.full{grid-column:auto}h1{font-size:1.55rem}.tabs{grid-template-columns:1fr}.wrap{padding:12px 10px 28px}.result .value{font-size:1.35rem}}
 </style>
 </head>
 <body>
 <main class="wrap">
-<h1>Molding Cycle Calculator</h1>
-<p class="sub">Injection molding production and resin usage.</p>
-<section class="card"><div class="grid">
-<div><label for="cycle">Cycle time (seconds)</label><input id="cycle" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="e.g. 30"></div>
-<div><label for="cav">Cavitation</label><input id="cav" type="number" min="1" step="1" inputmode="numeric" placeholder="e.g. 4"></div>
-<div><label for="partMass">Part mass (g)</label><input id="partMass" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 25"><span class="hint">Leave blank or enter 0 if resin usage is not needed.</span></div>
-<div><label for="runnerMass">Runner / sprue mass per shot (g)</label><input id="runnerMass" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 8"><span class="hint">Enter 0 for hot runner or no runner.</span></div>
-</div><button id="reset" type="button">Reset</button></section>
-<section class="card"><div class="results">
-<div class="result"><div class="label">Shots / Hour</div><div id="shotsHour" class="value">—</div></div>
-<div class="result"><div class="label">Parts / Hour</div><div id="partsHour" class="value">—</div></div>
-<div class="result"><div class="label">Shots / 24 Hours</div><div id="shotsDay" class="value">—</div></div>
-<div class="result"><div class="label">Parts / 24 Hours</div><div id="partsDay" class="value">—</div></div>
-<div class="result"><div class="label">Finished-Part Resin / 24 Hours</div><div id="partResin" class="value">—</div></div>
-<div class="result"><div class="label">Runner Resin / 24 Hours</div><div id="runnerResin" class="value">—</div></div>
-<div class="result emphasis"><div class="label">Total Resin / 24 Hours</div><div id="totalResin" class="value">—</div></div>
-</div></section>
-<section class="card formula"><strong>Calculations</strong><br>Shots/hr = 3600 ÷ cycle time<br>Parts/hr = shots/hr × cavitation<br>Parts/24 hr = parts/hr × 24<br>Total resin lb/24 hr = shots/24 hr × ((part mass × cavitation) + runner mass per shot) ÷ 453.592</section>
-<footer>Designed to work offline after installation to your Home Screen.</footer>
+<header><h1>Injection Molding Calculator</h1><p class="sub">Production, clamp tonnage, and cycle-time estimating tools.</p></header>
+<nav class="tabs" aria-label="Calculator selection"><button class="tab active" data-panel="production">Production / Resin</button><button class="tab" data-panel="clamp">Clamp Tonnage</button><button class="tab" data-panel="cycle">Cycle Time</button></nav>
+
+<section id="production" class="panel active">
+<div class="card"><h2 class="section-title">Production / Resin Usage</h2><div class="grid">
+<div><label for="pCycle">Cycle time (seconds)</label><input id="pCycle" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="e.g. 30"></div>
+<div><label for="pCav">Cavitation</label><input id="pCav" type="number" min="1" step="1" inputmode="numeric" placeholder="e.g. 4"></div>
+<div><label for="pPartMass">Part mass (g)</label><input id="pPartMass" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 25"><span class="hint">Leave blank or 0 if resin usage is not needed.</span></div>
+<div><label for="pRunnerMass">Runner / sprue mass per shot (g)</label><input id="pRunnerMass" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 8"><span class="hint">Use 0 for hot runner or no runner.</span></div>
+</div><div id="pWarning" class="warning"></div><div class="actions"><button id="pReset" class="secondary">Reset</button></div></div>
+<div class="card"><div class="results">
+<div class="result"><div class="label">Shots / Hour</div><div id="pShotsHr" class="value">—</div></div><div class="result"><div class="label">Parts / Hour</div><div id="pPartsHr" class="value">—</div></div><div class="result"><div class="label">Shots / 24 Hours</div><div id="pShotsDay" class="value">—</div></div><div class="result"><div class="label">Parts / 24 Hours</div><div id="pPartsDay" class="value">—</div></div><div class="result"><div class="label">Finished-Part Resin / 24 Hours</div><div id="pPartResin" class="value">—</div></div><div class="result"><div class="label">Runner Resin / 24 Hours</div><div id="pRunnerResin" class="value">—</div></div><div class="result emphasis full"><div class="label">Total Resin / 24 Hours</div><div id="pTotalResin" class="value">—</div></div>
+</div></div></section>
+
+<section id="clamp" class="panel">
+<div class="card"><h2 class="section-title">Clamp Tonnage Estimate</h2><div class="grid">
+<div><label for="cMaterial">Material</label><select id="cMaterial"></select></div>
+<div><label>Projected area of one part</label><div class="inline"><input id="cArea" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 16"><select id="cAreaUnit" class="unit"><option value="in2">in²</option><option value="cm2">cm²</option></select></div></div>
+<div><label for="cCav">Cavitation</label><input id="cCav" type="number" min="1" step="1" inputmode="numeric" placeholder="e.g. 2"></div>
+<div><label>Runner projected area</label><div class="inline"><input id="cRunnerArea" type="number" min="0" step="0.01" inputmode="decimal" placeholder="optional"><select id="cRunnerAreaUnit" class="unit"><option value="in2">in²</option><option value="cm2">cm²</option></select></div><span class="hint">Total projected runner/sprue area, not per cavity.</span></div>
+<div><label for="cSafety">Safety margin (%)</label><input id="cSafety" type="number" min="0" max="100" step="1" inputmode="decimal" value="10"></div>
+<div><label for="cPress">Available press size (tons)</label><input id="cPress" type="number" min="0" step="1" inputmode="decimal" placeholder="optional, e.g. 220"></div>
+</div>
+<div class="toggle"><input id="cManualToggle" type="checkbox"><label for="cManualToggle" style="margin:0">Use manual tonnage factor</label></div>
+<div id="cManualBox" class="grid hidden" style="margin-top:12px"><div><label for="cManualFactor">Manual factor (tons/in²)</label><input id="cManualFactor" type="number" min="0.1" step="0.1" inputmode="decimal" placeholder="e.g. 4.0"></div></div>
+<div id="cMaterialHint" class="callout" style="margin-top:12px"></div><div id="cWarning" class="warning"></div><div class="actions"><button id="cReset" class="secondary">Reset</button></div></div>
+<div class="card"><div class="results"><div class="result"><div class="label">Total Projected Area</div><div id="cTotalArea" class="value">—</div></div><div class="result"><div class="label">Estimated Clamp Range</div><div id="cRange" class="value">—</div></div><div class="result emphasis"><div class="label">Recommended Minimum Clamp</div><div id="cRecommended" class="value">—</div></div><div class="result" id="cPressCard"><div class="label">Selected Press Check</div><div id="cPressCheck" class="value">—</div></div></div><p class="note">Quoting / machine-selection estimate. Actual cavity pressure, flow length, gate design, wall thickness, mold construction, and process window can shift required clamp force.</p></div>
+</section>
+
+<section id="cycle" class="panel">
+<div class="card"><h2 class="section-title">Cycle Time Estimate</h2><div class="grid">
+<div><label for="tMaterial">Material</label><select id="tMaterial"></select></div>
+<div><label>Maximum wall thickness</label><div class="inline"><input id="tWall" type="number" min="0.1" step="0.01" inputmode="decimal" placeholder="e.g. 2.5"><select id="tWallUnit" class="unit"><option value="mm">mm</option><option value="in">in</option></select></div></div>
+<div><label for="tFillHold">Fill + pack/hold time (sec)</label><input id="tFillHold" type="number" min="0" step="0.1" inputmode="decimal"></div>
+<div><label for="tMotion">Mold open + eject + close (sec)</label><input id="tMotion" type="number" min="0" step="0.1" inputmode="decimal" value="4"></div>
+<div><label for="tRobot">Robot / insert handling (sec)</label><input id="tRobot" type="number" min="0" step="0.1" inputmode="decimal" value="0"></div>
+<div><label for="tCoeff">Cooling coefficient (sec/mm²)</label><input id="tCoeff" type="number" min="0.1" step="0.1" inputmode="decimal"><span class="hint">Material default is editable. Calibrate with known jobs over time.</span></div>
+</div><div id="tMaterialHint" class="callout" style="margin-top:12px"></div><div id="tWarning" class="warning"></div><div class="actions"><button id="tReset" class="secondary">Reset</button></div></div>
+<div class="card"><div class="results"><div class="result"><div class="label">Estimated Cooling Time</div><div id="tCooling" class="value">—</div></div><div class="result"><div class="label">Non-Cooling Time</div><div id="tOther" class="value">—</div></div><div class="result emphasis"><div class="label">Estimated Cycle</div><div id="tCycle" class="value">—</div></div><div class="result warn"><div class="label">Practical Estimate Range</div><div id="tRange" class="value">—</div></div></div><p class="note">Early-stage estimate only. Cooling is modeled as coefficient × wall thickness², then fill/hold, mold motion, and robot/insert time are added. Cooling design, temperatures, crystallinity, geometry, and quality requirements can materially change actual cycle time.</p></div>
+</section>
+<footer>Engineering estimate tool • Tune manual factors when better data is available.</footer>
 </main>
 <script>
-const $=id=>document.getElementById(id), ids=['cycle','cav','partMass','runnerMass'];
-const whole=new Intl.NumberFormat(undefined,{maximumFractionDigits:0}), one=new Intl.NumberFormat(undefined,{minimumFractionDigits:1,maximumFractionDigits:1});
-function val(id){const x=parseFloat($(id).value);return Number.isFinite(x)?x:0}
-function calc(){const cycle=val('cycle'),cav=val('cav'),pm=val('partMass'),rm=val('runnerMass');const outs=['shotsHour','partsHour','shotsDay','partsDay','partResin','runnerResin','totalResin'];if(cycle<=0||cav<=0){outs.forEach(i=>$(i).textContent='—');return}const sh=3600/cycle,ph=sh*cav,sd=sh*24,pd=ph*24,partLb=sd*(pm*cav)/453.592,runLb=sd*rm/453.592,total=partLb+runLb;$('shotsHour').textContent=whole.format(sh);$('partsHour').textContent=whole.format(ph);$('shotsDay').textContent=whole.format(sd);$('partsDay').textContent=whole.format(pd);if(pm>0||rm>0){$('partResin').textContent=one.format(partLb)+' lb';$('runnerResin').textContent=one.format(runLb)+' lb';$('totalResin').textContent=one.format(total)+' lb'}else{$('partResin').textContent=$('runnerResin').textContent=$('totalResin').textContent='—'}localStorage.setItem('moldingCalc',JSON.stringify(Object.fromEntries(ids.map(i=>[i,$(i).value]))))}
-ids.forEach(i=>$(i).addEventListener('input',calc));$('reset').addEventListener('click',()=>{ids.forEach(i=>$(i).value='');localStorage.removeItem('moldingCalc');calc();$('cycle').focus()});try{const s=JSON.parse(localStorage.getItem('moldingCalc')||'{}');ids.forEach(i=>{if(s[i]!=null)$(i).value=s[i]})}catch(e){}calc();if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
+const materials={
+"PP — Unfilled":{clamp:[2.0,3.0],cool:2.8,fill:3.5,note:"General-purpose PP baseline."},
+"PP — GF 15%":{clamp:[2.7,3.7],cool:2.5,fill:3.8,note:"Glass-filled PP baseline."},
+"PP — GF 30%":{clamp:[3.0,4.0],cool:2.3,fill:4.0,note:"30% glass-filled PP baseline."},
+"PP — GF 40%+":{clamp:[3.3,4.3],cool:2.2,fill:4.2,note:"High glass loading; verify with supplier or known-job data."},
+"PP — CaCO₃ 20%":{clamp:[2.4,3.4],cool:2.6,fill:3.7,note:"Mineral-filled PP baseline."},
+"PP — CaCO₃ 30%":{clamp:[2.6,3.6],cool:2.5,fill:3.8,note:"30% CaCO₃-filled PP baseline."},
+"PP — CaCO₃ 40%+":{clamp:[2.8,3.8],cool:2.4,fill:4.0,note:"High mineral loading; verify with supplier data."},
+"HDPE — Unfilled":{clamp:[2.0,3.0],cool:3.0,fill:3.5,note:"General-purpose HDPE baseline."},
+"HDPE — CaCO₃ 20%":{clamp:[2.4,3.4],cool:2.8,fill:3.7,note:"Mineral-filled HDPE baseline."},
+"HDPE — CaCO₃ 30%":{clamp:[2.6,3.6],cool:2.7,fill:3.8,note:"30% CaCO₃-filled HDPE baseline."},
+"HDPE — CaCO₃ 40%+":{clamp:[2.8,3.8],cool:2.6,fill:4.0,note:"High mineral loading; verify with known data."},
+"PA6 — Unfilled":{clamp:[3.0,4.5],cool:2.6,fill:4.0,note:"Nylon 6 baseline."},
+"PA6 — GF 15%":{clamp:[3.5,4.8],cool:2.4,fill:4.2,note:"Glass-filled PA6 baseline."},
+"PA6 — GF 30%":{clamp:[3.8,5.0],cool:2.2,fill:4.4,note:"30% glass-filled PA6 baseline."},
+"PA6 — GF 40%+":{clamp:[4.0,5.3],cool:2.1,fill:4.6,note:"High glass loading; thin walls / long flow may require more pressure."},
+"PA66 — Unfilled":{clamp:[3.2,4.7],cool:2.7,fill:4.1,note:"Nylon 66 baseline."},
+"PA66 — GF 15%":{clamp:[3.6,5.0],cool:2.5,fill:4.3,note:"Glass-filled PA66 baseline."},
+"PA66 — GF 30%":{clamp:[4.0,5.2],cool:2.3,fill:4.5,note:"30% glass-filled PA66 baseline."},
+"PA66 — GF 40%+":{clamp:[4.2,5.5],cool:2.2,fill:4.8,note:"High glass loading; use known job data where possible."},
+"ABS":{clamp:[3.0,4.0],cool:3.6,fill:4.0,note:"ABS baseline."},
+"PC":{clamp:[4.0,5.5],cool:5.0,fill:4.8,note:"PC often needs higher pressure and longer cooling."},
+"PC/ABS":{clamp:[3.8,5.0],cool:4.3,fill:4.5,note:"PC/ABS baseline."},
+"POM / Acetal":{clamp:[3.0,4.0],cool:3.0,fill:3.8,note:"Acetal baseline; gate freeze and crystalline shrinkage matter."},
+"PBT":{clamp:[3.2,4.5],cool:3.0,fill:4.0,note:"PBT baseline; filled grades may need higher factors."},
+"PET":{clamp:[3.3,4.7],cool:3.3,fill:4.2,note:"PET baseline."},
+"TPE / TPU":{clamp:[3.0,4.5],cool:5.5,fill:4.0,note:"Broad family; hardness and chemistry can change cooling substantially."},
+"PPS":{clamp:[4.0,5.5],cool:3.5,fill:4.6,note:"High-temperature engineering resin baseline."},
+"PEEK":{clamp:[5.0,6.5],cool:5.5,fill:5.0,note:"Rough pre-quote baseline only; use supplier/process data when available."},
+"Custom / Manual":{clamp:[3.0,4.0],cool:3.0,fill:4.0,note:"Use manual values from simulation, datasheet, or known-job history."}
+};
+const q=id=>document.getElementById(id), num=id=>{const x=parseFloat(q(id).value);return Number.isFinite(x)?x:0};
+const fmt0=new Intl.NumberFormat(undefined,{maximumFractionDigits:0}),fmt1=new Intl.NumberFormat(undefined,{minimumFractionDigits:1,maximumFractionDigits:1}),fmt2=new Intl.NumberFormat(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const set=(id,v)=>q(id).textContent=v, warn=(id,msg)=>{q(id).textContent=msg;q(id).style.display=msg?'block':'none'}, in2=(v,u)=>u==='cm2'?v/6.4516:v, mm=(v,u)=>u==='in'?v*25.4:v;
+for(const id of ['cMaterial','tMaterial']){for(const name of Object.keys(materials)){const o=document.createElement('option');o.value=name;o.textContent=name;q(id).appendChild(o)}}
+q('cMaterial').value='PP — Unfilled';q('tMaterial').value='PP — Unfilled';
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');q(b.dataset.panel).classList.add('active');localStorage.setItem('activeCalc',b.dataset.panel)}));
+const ap=localStorage.getItem('activeCalc');if(ap&&q(ap))document.querySelector(`.tab[data-panel="${ap}"]`)?.click();
+function prod(){warn('pWarning','');const c=num('pCycle'),v=num('pCav'),pm=num('pPartMass'),rm=num('pRunnerMass');if(!c||!v){['pShotsHr','pPartsHr','pShotsDay','pPartsDay','pPartResin','pRunnerResin','pTotalResin'].forEach(id=>set(id,'—'));return}const sh=3600/c,ph=sh*v,sd=sh*24,pd=ph*24,pl=sd*(pm*v)/453.59237,rl=sd*rm/453.59237;set('pShotsHr',fmt0.format(sh));set('pPartsHr',fmt0.format(ph));set('pShotsDay',fmt0.format(sd));set('pPartsDay',fmt0.format(pd));if(pm>0||rm>0){set('pPartResin',fmt1.format(pl)+' lb');set('pRunnerResin',fmt1.format(rl)+' lb');set('pTotalResin',fmt1.format(pl+rl)+' lb')}else{set('pPartResin','—');set('pRunnerResin','—');set('pTotalResin','—')}save()}
+['pCycle','pCav','pPartMass','pRunnerMass'].forEach(id=>q(id).addEventListener('input',prod));q('pReset').addEventListener('click',()=>{['pCycle','pCav','pPartMass','pRunnerMass'].forEach(id=>q(id).value='');prod();save()});
+function clampHint(){const m=materials[q('cMaterial').value];q('cMaterialHint').textContent=`Default clamp factor: ${m.clamp[0].toFixed(1)}–${m.clamp[1].toFixed(1)} tons/in². ${m.note}`;clamp()}
+function clamp(){warn('cWarning','');const a=in2(num('cArea'),q('cAreaUnit').value),r=in2(num('cRunnerArea'),q('cRunnerAreaUnit').value),c=num('cCav'),s=num('cSafety');if(!a||!c){['cTotalArea','cRange','cRecommended','cPressCheck'].forEach(id=>set(id,'—'));return}const total=a*c+r,m=materials[q('cMaterial').value];let lo=m.clamp[0],hi=m.clamp[1];if(q('cManualToggle').checked){const f=num('cManualFactor');if(!f){warn('cWarning','Enter a manual tons/in² factor.');return}lo=hi=f}const low=total*lo,high=total*hi,rec=high*(1+s/100);set('cTotalArea',fmt2.format(total)+' in²');set('cRange',lo===hi?fmt1.format(high)+' tons':`${fmt1.format(low)}–${fmt1.format(high)} tons`);set('cRecommended',fmt1.format(rec)+' tons');const p=num('cPress'),card=q('cPressCard');card.classList.remove('emphasis','warn');if(p>0){const util=rec/p*100;if(p>=rec){set('cPressCheck',`${fmt0.format(util)}% of ${fmt0.format(p)}T`);card.classList.add('emphasis')}else{set('cPressCheck',`Too small (${fmt0.format(util)}% required)`);card.classList.add('warn')}}else set('cPressCheck','—');save()}
+q('cManualToggle').addEventListener('change',()=>{q('cManualBox').classList.toggle('hidden',!q('cManualToggle').checked);clamp()});
+['cArea','cCav','cRunnerArea','cSafety','cPress','cManualFactor'].forEach(id=>q(id).addEventListener('input',clamp));['cAreaUnit','cRunnerAreaUnit'].forEach(id=>q(id).addEventListener('change',clamp));q('cMaterial').addEventListener('change',clampHint);q('cReset').addEventListener('click',()=>{q('cMaterial').value='PP — Unfilled';q('cArea').value='';q('cAreaUnit').value='in2';q('cCav').value='';q('cRunnerArea').value='';q('cRunnerAreaUnit').value='in2';q('cSafety').value='10';q('cPress').value='';q('cManualToggle').checked=false;q('cManualBox').classList.add('hidden');q('cManualFactor').value='';clampHint();save()});
+function cycleHint(setDefaults=true){const m=materials[q('tMaterial').value];q('tMaterialHint').textContent=`Starting defaults: cooling coefficient ${m.cool.toFixed(1)} sec/mm²; fill + hold ${m.fill.toFixed(1)} sec. ${m.note}`;if(setDefaults){q('tCoeff').value=m.cool;q('tFillHold').value=m.fill}cycle()}
+function cycle(){warn('tWarning','');const w=mm(num('tWall'),q('tWallUnit').value),k=num('tCoeff'),f=num('tFillHold'),m=num('tMotion'),r=num('tRobot');if(!w){['tCooling','tOther','tCycle','tRange'].forEach(id=>set(id,'—'));return}if(k<=0){warn('tWarning','Cooling coefficient must be greater than zero.');return}const cool=k*w*w,other=f+m+r,cy=cool+other,lo=other+cool*.85,hi=other+cool*1.20;set('tCooling',fmt1.format(cool)+' sec');set('tOther',fmt1.format(other)+' sec');set('tCycle',fmt1.format(cy)+' sec');set('tRange',`${fmt1.format(lo)}–${fmt1.format(hi)} sec`);save()}
+q('tMaterial').addEventListener('change',()=>cycleHint(true));['tWall','tFillHold','tMotion','tRobot','tCoeff'].forEach(id=>q(id).addEventListener('input',cycle));q('tWallUnit').addEventListener('change',cycle);q('tReset').addEventListener('click',()=>{q('tMaterial').value='PP — Unfilled';q('tWall').value='';q('tWallUnit').value='mm';q('tMotion').value='4';q('tRobot').value='0';cycleHint(true);save()});
+const fields=['pCycle','pCav','pPartMass','pRunnerMass','cMaterial','cArea','cAreaUnit','cCav','cRunnerArea','cRunnerAreaUnit','cSafety','cPress','cManualFactor','tMaterial','tWall','tWallUnit','tFillHold','tMotion','tRobot','tCoeff'];
+function save(){const d={};fields.forEach(id=>d[id]=q(id).value);d.cManualToggle=q('cManualToggle').checked;localStorage.setItem('moldingCalcV2',JSON.stringify(d))}
+function restore(){try{const d=JSON.parse(localStorage.getItem('moldingCalcV2')||'{}');fields.forEach(id=>{if(d[id]!==undefined)q(id).value=d[id]});if(d.cManualToggle!==undefined){q('cManualToggle').checked=!!d.cManualToggle;q('cManualBox').classList.toggle('hidden',!q('cManualToggle').checked)}}catch{}}
+restore();clampHint();cycleHint(false);if(!q('tCoeff').value||!q('tFillHold').value)cycleHint(true);prod();clamp();cycle();
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
 </script>
 </body></html>
