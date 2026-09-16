@@ -14,7 +14,7 @@
 :root{--bg:#f3f4f6;--card:#fff;--text:#111827;--muted:#6b7280;--border:#d1d5db;--accent:#2563eb;--good:#047857;--warn:#92400e;--bad:#991b1b;--shadow:0 10px 25px rgba(0,0,0,.07)}
 *{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
 .wrap{max-width:840px;margin:0 auto;padding:18px 14px 40px} header{margin:4px 0 14px} h1{margin:0;font-size:1.8rem;line-height:1.15}.sub{margin:5px 0 0;color:var(--muted);font-size:.93rem}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 16px}.tab{border:1px solid var(--border);background:#fff;color:var(--text);padding:11px 8px;border-radius:12px;font-weight:750;font-size:.9rem;min-height:48px}.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0 16px}.tab{border:1px solid var(--border);background:#fff;color:var(--text);padding:11px 8px;border-radius:12px;font-weight:750;font-size:.9rem;min-height:48px}.tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .panel{display:none}.panel.active{display:block}.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}.section-title{font-size:1.12rem;font-weight:800;margin:0 0 12px}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}label{display:block;font-weight:700;font-size:.92rem;margin-bottom:6px}.hint{display:block;color:var(--muted);font-size:.77rem;margin-top:4px;line-height:1.35}
 input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--border);border-radius:11px;background:#fff;color:var(--text);outline:none;min-height:46px}input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
@@ -25,8 +25,8 @@ input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--
 </head>
 <body>
 <main class="wrap">
-<header><h1>Injection Molding Calculator</h1><p class="sub">Production, clamp tonnage, and cycle-time estimating tools.</p></header>
-<nav class="tabs" aria-label="Calculator selection"><button class="tab active" data-panel="production">Production / Resin</button><button class="tab" data-panel="clamp">Clamp Tonnage</button><button class="tab" data-panel="cycle">Cycle Time</button></nav>
+<header><h1>Injection Molding Calculator</h1><p class="sub">Production, tooling, material, and process estimating tools.</p></header>
+<nav class="tabs" aria-label="Calculator selection"><button class="tab active" data-panel="production">Production / Resin</button><button class="tab" data-panel="clamp">Clamp Tonnage</button><button class="tab" data-panel="cycle">Cycle Time</button><button class="tab" data-panel="ash">Ash Test</button><button class="tab" data-panel="runner">Runner %</button></nav>
 
 <section id="production" class="panel active">
 <div class="card"><h2 class="section-title">Production / Resin Usage</h2><div class="grid">
@@ -65,7 +65,72 @@ input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--
 </div><div id="tMaterialHint" class="callout" style="margin-top:12px"></div><div id="tWarning" class="warning"></div><div class="actions"><button id="tReset" class="secondary">Reset</button></div></div>
 <div class="card"><div class="results"><div class="result"><div class="label">Estimated Cooling Time</div><div id="tCooling" class="value">—</div></div><div class="result"><div class="label">Non-Cooling Time</div><div id="tOther" class="value">—</div></div><div class="result emphasis"><div class="label">Estimated Cycle</div><div id="tCycle" class="value">—</div></div><div class="result warn"><div class="label">Practical Estimate Range</div><div id="tRange" class="value">—</div></div></div><p class="note">Early-stage estimate only. Cooling is modeled as coefficient × wall thickness², then fill/hold, mold motion, and robot/insert time are added. Cooling design, temperatures, crystallinity, geometry, and quality requirements can materially change actual cycle time.</p></div>
 </section>
-<footer>Engineering estimate tool • Tune manual factors when better data is available.</footer>
+
+<section id="ash" class="panel">
+<div class="card"><h2 class="section-title">Ash Test</h2><div class="grid">
+<div><label for="aPan">Empty ash pan mass (g)</label><input id="aPan" type="number" min="0" step="0.0001" inputmode="decimal" placeholder="e.g. 24.3271"></div>
+<div><label for="aPanParts">Pan + sample before burn (g)</label><input id="aPanParts" type="number" min="0" step="0.0001" inputmode="decimal" placeholder="e.g. 29.4128"></div>
+<div><label for="aPanAsh">Pan + ash after burn (g)</label><input id="aPanAsh" type="number" min="0" step="0.0001" inputmode="decimal" placeholder="e.g. 25.8314"></div>
+</div><div id="aWarning" class="warning"></div><div class="actions"><button id="aReset" class="secondary">Reset</button></div></div>
+
+<div class="card"><div class="results">
+<div class="result"><div class="label">Original Sample Mass</div><div id="aSampleMass" class="value">—</div></div>
+<div class="result"><div class="label">Ash Mass</div><div id="aAshMass" class="value">—</div></div>
+<div class="result emphasis full"><div class="label">Ash Remaining</div><div id="aAshPct" class="value">—</div></div>
+</div>
+<p class="note">Ash % = (pan + ash − empty pan) ÷ (pan + original sample − empty pan) × 100. Use consistent mass units; grams are shown here for convenience.</p>
+</div>
+</section>
+
+<section id="runner" class="panel">
+<div class="card"><h2 class="section-title">Runner % of Shot Weight</h2>
+<div class="toggle"><input id="rModeKnown" type="radio" name="runnerMode" value="known" checked><label for="rModeKnown" style="margin:0">I know the runner mass / volume — calculate runner %</label></div>
+<div class="toggle"><input id="rModeTarget" type="radio" name="runnerMode" value="target"><label for="rModeTarget" style="margin:0">I know the target % — calculate allowable runner mass / volume</label></div>
+</div>
+
+<div id="rKnownBox" class="card">
+<h2 class="section-title">Known Runner → Runner %</h2>
+<div class="grid">
+<div><label for="rKnownUnit">Basis</label><select id="rKnownUnit"><option value="g">Mass (g)</option><option value="cm3">Volume (cm³)</option></select></div>
+<div><label for="rKnownPart">Part mass / volume (each)</label><input id="rKnownPart" type="number" min="0" step="0.001" inputmode="decimal" placeholder="e.g. 25"></div>
+<div><label for="rKnownCav">Cavitation</label><input id="rKnownCav" type="number" min="1" step="1" inputmode="numeric" placeholder="e.g. 4"></div>
+<div><label for="rKnownRunner">Runner mass / volume per shot</label><input id="rKnownRunner" type="number" min="0" step="0.001" inputmode="decimal" placeholder="e.g. 18"></div>
+</div><div id="rKnownWarning" class="warning"></div>
+<div class="actions"><button id="rKnownReset" class="secondary">Reset</button></div>
+</div>
+
+<div id="rKnownResults" class="card">
+<div class="results">
+<div class="result"><div class="label">Total Part Mass / Volume per Shot</div><div id="rKnownPartsTotal" class="value">—</div></div>
+<div class="result"><div class="label">Total Shot Mass / Volume</div><div id="rKnownShot" class="value">—</div></div>
+<div class="result emphasis full"><div class="label">Runner % of Total Shot</div><div id="rKnownPct" class="value">—</div></div>
+</div>
+<p class="note">Runner % = runner ÷ (total molded parts + runner) × 100.</p>
+</div>
+
+<div id="rTargetBox" class="card hidden">
+<h2 class="section-title">Target Runner % → Runner Size</h2>
+<div class="grid">
+<div><label for="rTargetUnit">Basis</label><select id="rTargetUnit"><option value="g">Mass (g)</option><option value="cm3">Volume (cm³)</option></select></div>
+<div><label for="rTargetPart">Part mass / volume (each)</label><input id="rTargetPart" type="number" min="0" step="0.001" inputmode="decimal" placeholder="e.g. 25"></div>
+<div><label for="rTargetCav">Cavitation</label><input id="rTargetCav" type="number" min="1" step="1" inputmode="numeric" placeholder="e.g. 4"></div>
+<div><label for="rTargetPct">Target runner % of total shot</label><select id="rTargetPct"><option value="10">10%</option><option value="15">15%</option><option value="20" selected>20%</option><option value="custom">Custom</option></select></div>
+<div id="rCustomPctBox" class="hidden"><label for="rCustomPct">Custom target (%)</label><input id="rCustomPct" type="number" min="0.1" max="99" step="0.1" inputmode="decimal" placeholder="e.g. 12.5"></div>
+</div><div id="rTargetWarning" class="warning"></div>
+<div class="actions"><button id="rTargetReset" class="secondary">Reset</button></div>
+</div>
+
+<div id="rTargetResults" class="card hidden">
+<div class="results">
+<div class="result"><div class="label">Total Part Mass / Volume per Shot</div><div id="rTargetPartsTotal" class="value">—</div></div>
+<div class="result"><div class="label">Target Runner %</div><div id="rTargetPctOut" class="value">—</div></div>
+<div class="result emphasis full"><div class="label">Maximum Runner Mass / Volume per Shot</div><div id="rTargetRunner" class="value">—</div></div>
+</div>
+<p class="note">To make the runner a target percentage of the total shot: runner = [target % ÷ (100 − target %)] × total part mass / volume.</p>
+</div>
+</section>
+
+<footer>Injection molding engineering calculator • Use validated process and test methods where required.</footer>
 </main>
 <script>
 const materials={
@@ -115,10 +180,89 @@ q('cManualToggle').addEventListener('change',()=>{q('cManualBox').classList.togg
 function cycleHint(setDefaults=true){const m=materials[q('tMaterial').value];q('tMaterialHint').textContent=`Starting defaults: cooling coefficient ${m.cool.toFixed(1)} sec/mm²; fill + hold ${m.fill.toFixed(1)} sec. ${m.note}`;if(setDefaults){q('tCoeff').value=m.cool;q('tFillHold').value=m.fill}cycle()}
 function cycle(){warn('tWarning','');const w=mm(num('tWall'),q('tWallUnit').value),k=num('tCoeff'),f=num('tFillHold'),m=num('tMotion'),r=num('tRobot');if(!w){['tCooling','tOther','tCycle','tRange'].forEach(id=>set(id,'—'));return}if(k<=0){warn('tWarning','Cooling coefficient must be greater than zero.');return}const cool=k*w*w,other=f+m+r,cy=cool+other,lo=other+cool*.85,hi=other+cool*1.20;set('tCooling',fmt1.format(cool)+' sec');set('tOther',fmt1.format(other)+' sec');set('tCycle',fmt1.format(cy)+' sec');set('tRange',`${fmt1.format(lo)}–${fmt1.format(hi)} sec`);save()}
 q('tMaterial').addEventListener('change',()=>cycleHint(true));['tWall','tFillHold','tMotion','tRobot','tCoeff'].forEach(id=>q(id).addEventListener('input',cycle));q('tWallUnit').addEventListener('change',cycle);q('tReset').addEventListener('click',()=>{q('tMaterial').value='PP — Unfilled';q('tWall').value='';q('tWallUnit').value='mm';q('tMotion').value='4';q('tRobot').value='0';cycleHint(true);save()});
-const fields=['pCycle','pCav','pPartMass','pRunnerMass','cMaterial','cArea','cAreaUnit','cCav','cRunnerArea','cRunnerAreaUnit','cSafety','cPress','cManualFactor','tMaterial','tWall','tWallUnit','tFillHold','tMotion','tRobot','tCoeff'];
-function save(){const d={};fields.forEach(id=>d[id]=q(id).value);d.cManualToggle=q('cManualToggle').checked;localStorage.setItem('moldingCalcV2',JSON.stringify(d))}
-function restore(){try{const d=JSON.parse(localStorage.getItem('moldingCalcV2')||'{}');fields.forEach(id=>{if(d[id]!==undefined)q(id).value=d[id]});if(d.cManualToggle!==undefined){q('cManualToggle').checked=!!d.cManualToggle;q('cManualBox').classList.toggle('hidden',!q('cManualToggle').checked)}}catch{}}
-restore();clampHint();cycleHint(false);if(!q('tCoeff').value||!q('tFillHold').value)cycleHint(true);prod();clamp();cycle();
+
+function ash(){
+  warn('aWarning','');
+  const pan=num('aPan'), before=num('aPanParts'), after=num('aPanAsh');
+  if(!pan || !before || !after){
+    ['aSampleMass','aAshMass','aAshPct'].forEach(id=>set(id,'—'));
+    return;
+  }
+  const sample=before-pan, ashMass=after-pan;
+  if(sample<=0){warn('aWarning','Pan + sample must be greater than the empty pan mass.');return}
+  if(ashMass<0){warn('aWarning','Pan + ash cannot be less than the empty pan mass.');return}
+  const pct=ashMass/sample*100;
+  set('aSampleMass',fmt2.format(sample)+' g');
+  set('aAshMass',fmt2.format(ashMass)+' g');
+  set('aAshPct',fmt2.format(pct)+'%');
+  save();
+}
+['aPan','aPanParts','aPanAsh'].forEach(id=>q(id).addEventListener('input',ash));
+q('aReset').addEventListener('click',()=>{['aPan','aPanParts','aPanAsh'].forEach(id=>q(id).value='');ash();save()});
+
+function runnerMode(){
+  const target=q('rModeTarget').checked;
+  q('rKnownBox').classList.toggle('hidden',target);
+  q('rKnownResults').classList.toggle('hidden',target);
+  q('rTargetBox').classList.toggle('hidden',!target);
+  q('rTargetResults').classList.toggle('hidden',!target);
+  save();
+}
+q('rModeKnown').addEventListener('change',runnerMode);
+q('rModeTarget').addEventListener('change',runnerMode);
+
+function runnerKnown(){
+  warn('rKnownWarning','');
+  const part=num('rKnownPart'), cav=num('rKnownCav'), runner=num('rKnownRunner');
+  const unit=q('rKnownUnit').value==='cm3'?' cm³':' g';
+  if(!part || !cav){
+    ['rKnownPartsTotal','rKnownShot','rKnownPct'].forEach(id=>set(id,'—'));
+    return;
+  }
+  if(part<=0 || cav<=0 || runner<0){warn('rKnownWarning','Part value and cavitation must be greater than zero; runner cannot be negative.');return}
+  const partsTotal=part*cav, shot=partsTotal+runner, pct=runner/shot*100;
+  set('rKnownPartsTotal',fmt2.format(partsTotal)+unit);
+  set('rKnownShot',fmt2.format(shot)+unit);
+  set('rKnownPct',fmt2.format(pct)+'%');
+  save();
+}
+['rKnownPart','rKnownCav','rKnownRunner'].forEach(id=>q(id).addEventListener('input',runnerKnown));
+q('rKnownUnit').addEventListener('change',runnerKnown);
+q('rKnownReset').addEventListener('click',()=>{q('rKnownPart').value='';q('rKnownCav').value='';q('rKnownRunner').value='';runnerKnown();save()});
+
+function targetPctValue(){
+  if(q('rTargetPct').value==='custom') return num('rCustomPct');
+  return parseFloat(q('rTargetPct').value);
+}
+function runnerTarget(){
+  warn('rTargetWarning','');
+  const part=num('rTargetPart'), cav=num('rTargetCav'), pct=targetPctValue();
+  const unit=q('rTargetUnit').value==='cm3'?' cm³':' g';
+  if(!part || !cav){
+    ['rTargetPartsTotal','rTargetPctOut','rTargetRunner'].forEach(id=>set(id,'—'));
+    return;
+  }
+  if(part<=0 || cav<=0){warn('rTargetWarning','Part value and cavitation must be greater than zero.');return}
+  if(!pct || pct<=0 || pct>=100){warn('rTargetWarning','Target runner percentage must be greater than 0% and less than 100%.');return}
+  const partsTotal=part*cav;
+  const runner=(pct/(100-pct))*partsTotal;
+  set('rTargetPartsTotal',fmt2.format(partsTotal)+unit);
+  set('rTargetPctOut',fmt1.format(pct)+'%');
+  set('rTargetRunner',fmt2.format(runner)+unit);
+  save();
+}
+q('rTargetPct').addEventListener('change',()=>{
+  q('rCustomPctBox').classList.toggle('hidden',q('rTargetPct').value!=='custom');
+  runnerTarget();
+});
+['rTargetPart','rTargetCav','rCustomPct'].forEach(id=>q(id).addEventListener('input',runnerTarget));
+q('rTargetUnit').addEventListener('change',runnerTarget);
+q('rTargetReset').addEventListener('click',()=>{q('rTargetPart').value='';q('rTargetCav').value='';q('rTargetPct').value='20';q('rCustomPct').value='';q('rCustomPctBox').classList.add('hidden');runnerTarget();save()});
+
+const fields=['pCycle','pCav','pPartMass','pRunnerMass','cMaterial','cArea','cAreaUnit','cCav','cRunnerArea','cRunnerAreaUnit','cSafety','cPress','cManualFactor','tMaterial','tWall','tWallUnit','tFillHold','tMotion','tRobot','tCoeff','aPan','aPanParts','aPanAsh','rKnownUnit','rKnownPart','rKnownCav','rKnownRunner','rTargetUnit','rTargetPart','rTargetCav','rTargetPct','rCustomPct'];
+function save(){const d={};fields.forEach(id=>d[id]=q(id).value);d.cManualToggle=q('cManualToggle').checked;d.runnerMode=q('rModeTarget').checked?'target':'known';localStorage.setItem('moldingCalcV3',JSON.stringify(d))}
+function restore(){try{let raw=localStorage.getItem('moldingCalcV3');if(!raw)raw=localStorage.getItem('moldingCalcV2');const d=JSON.parse(raw||'{}');fields.forEach(id=>{if(d[id]!==undefined)q(id).value=d[id]});if(d.cManualToggle!==undefined){q('cManualToggle').checked=!!d.cManualToggle;q('cManualBox').classList.toggle('hidden',!q('cManualToggle').checked)}if(d.runnerMode==='target')q('rModeTarget').checked=true;else q('rModeKnown').checked=true;q('rCustomPctBox').classList.toggle('hidden',q('rTargetPct').value!=='custom')}catch{}}
+restore();clampHint();cycleHint(false);if(!q('tCoeff').value||!q('tFillHold').value)cycleHint(true);prod();clamp();cycle();ash();runnerMode();runnerKnown();runnerTarget();
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
 </script>
 </body></html>
