@@ -72,7 +72,8 @@ input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--
 
 <div class="grid" style="margin-top:10px">
 <div><label for="tDimUnit">Part dimension units</label><select id="tDimUnit"><option value="mm">mm</option><option value="in">inches</option></select></div>
-<div><label>Resin volume per part</label><div class="inline"><input id="tVolume" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 50"><select id="tVolumeUnit" class="unit"><option value="cm3">cm³</option><option value="in3">in³</option></select></div></div>
+<div><label>Resin volume per part</label><div class="inline"><input id="tVolume" type="number" min="0" step="0.01" inputmode="decimal" placeholder="optional, e.g. 50"><select id="tVolumeUnit" class="unit"><option value="cm3">cm³</option><option value="in3">in³</option></select></div></div>
+<div><label for="tPartMass">Part mass (g)</label><input id="tPartMass" type="number" min="0" step="0.01" inputmode="decimal" placeholder="optional, e.g. 82"></div>
 <div><label for="tCav">Cavitation</label><input id="tCav" type="number" min="1" step="1" inputmode="numeric" value="1"></div>
 <div><label for="tFeedConcept">Feed-system concept</label>
 <select id="tFeedConcept">
@@ -139,21 +140,51 @@ input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--
 </div>
 
 <div class="card">
-<h2 class="section-title">Known Similar Part / BRI Reference</h2>
-<div class="toggle"><input id="tCompareToggle" type="checkbox"><label for="tCompareToggle" style="margin:0">I have an actual cycle from a similar part</label></div>
-<div id="tCompareBox" class="hidden" style="margin-top:10px">
+<h2 class="section-title">Comparable Existing Part</h2>
+<div class="toggle"><input id="tCompareToggle" type="checkbox"><label for="tCompareToggle" style="margin:0">I have an existing part to compare with</label></div>
+
+<div id="tCompareBox" class="hidden" style="margin-top:12px">
+<p class="note" style="margin-top:0">Enter only what you know. Actual cycle is the only required comparison value. More actual process data improves the usefulness of the reference.</p>
+
 <div class="grid">
-<div><label for="tCompareCycle">Actual cycle (sec)</label><input id="tCompareCycle" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 43"></div>
-<div><label for="tCompareSimilarity">How similar is it?</label><select id="tCompareSimilarity"><option value="high">Very similar</option><option value="medium" selected>Somewhat similar</option><option value="low">Loose comparison</option></select></div>
-<div><label for="tRefName">Reference name / note</label><input id="tRefName" type="text" maxlength="60" placeholder="e.g. PA6 housing"></div>
+<div><label for="tRefName">Reference name / part number</label><input id="tRefName" type="text" maxlength="60" placeholder="e.g. 9025828"></div>
+<div><label for="tRefMaterial">Reference resin</label><select id="tRefMaterial"></select></div>
+
+<div><label for="tCompareCycle">Actual cycle (sec) *</label><input id="tCompareCycle" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 43"></div>
+<div><label for="tRefWall">Part thickness (in)</label><input id="tRefWall" type="number" min="0" step="0.001" inputmode="decimal" placeholder="optional"></div>
+
+<div><label for="tRefMass">Part mass (g)</label><input id="tRefMass" type="number" min="0" step="0.01" inputmode="decimal" placeholder="optional"></div>
+<div><label for="tRefShut">Part shut height (in)</label><input id="tRefShut" type="number" min="0" step="0.001" inputmode="decimal" placeholder="optional"></div>
+
+<div><label for="tRefShot">Shot weight (g)</label><input id="tRefShot" type="number" min="0" step="0.01" inputmode="decimal" placeholder="optional"></div>
+<div><label for="tRefCav">Cavitation</label><input id="tRefCav" type="number" min="1" step="1" inputmode="numeric" placeholder="optional"></div>
 </div>
-<div class="toggle" style="margin-top:10px"><input id="tSaveCompare" type="checkbox"><label for="tSaveCompare" style="margin:0">Save this as a BRI reference job for future estimates</label></div>
-<div class="actions"><button id="tApplyKnown" type="button" style="background:var(--accent);color:#fff">Apply Known Cycle</button></div>
+
+<h3 class="section-title" style="margin-top:16px">Optional Actual Cycle Breakdown</h3>
+<div class="grid">
+<div><label for="tRefCooling">Cooling time (sec)</label><input id="tRefCooling" type="number" min="0" step="0.1" inputmode="decimal" placeholder="optional"></div>
+<div><label for="tRefRecovery">Recovery dwell / screw recovery (sec)</label><input id="tRefRecovery" type="number" min="0" step="0.1" inputmode="decimal" placeholder="optional"></div>
+<div><label for="tRefFill">Fill time (sec)</label><input id="tRefFill" type="number" min="0" step="0.1" inputmode="decimal" placeholder="optional"></div>
+<div><label for="tRefPack">Pack + hold time (sec)</label><input id="tRefPack" type="number" min="0" step="0.1" inputmode="decimal" placeholder="optional"></div>
+<div><label for="tRefEject">Part ejection / removal time (sec)</label><input id="tRefEject" type="number" min="0" step="0.1" inputmode="decimal" placeholder="optional"></div>
+</div>
+
+<div class="toggle" style="margin-top:12px"><input id="tSaveCompare" type="checkbox"><label for="tSaveCompare" style="margin:0">Save this reference for future estimates</label></div>
+
+<div class="actions">
+<button id="tApplyKnown" type="button" style="background:var(--accent);color:#fff">Apply Comparison</button>
+<button id="tClearCompare" class="secondary" type="button">Clear Comparison</button>
+</div>
 <div id="tRefStatus" class="hint" style="margin-top:8px"></div>
 </div>
+
+<div style="margin-top:16px">
+<strong>Saved reference jobs</strong>
 <div id="tRefList" class="ref-list"></div>
 <div class="actions"><button id="tClearRefs" class="secondary" type="button">Clear Saved References</button></div>
-<p class="note">A known cycle can adjust the current quote without being saved. Check “Save this as a BRI reference job” when you want the app to use that job automatically in future estimates.</p>
+</div>
+
+<p class="note">Incomplete records are allowed. A reference with resin + wall thickness + actual cycle can still help. References with part mass, shot weight, shut height, and actual cycle-stage times receive more weight.</p>
 </div>
 
 <div class="card">
@@ -384,59 +415,150 @@ function currentCycleSignature(){
     family:materials[q('tMaterial').value].family,
     wall:mm(num('tWall'),q('tWallUnit').value),
     volume:volToCm3(num('tVolume'),q('tVolumeUnit').value),
+    mass:num('tPartMass'),
     length:dimToMm(num('tLen'),q('tDimUnit').value),
     width:dimToMm(num('tWid'),q('tDimUnit').value),
     shut:dimToMm(num('tShut'),q('tDimUnit').value),
     cav:Math.max(1,num('tCav')),
+    shot:(num('tPartMass')>0 ? num('tPartMass')*Math.max(1,num('tCav')) : 0),
     feed:q('tFeedConcept').value,
     insert:q('tInsert').value,
     removal:q('tRemoval').value
   };
 }
 
-function refWeight(ref,cur){
-  let w=0;
-  if(ref.family===cur.family) w+=5;
-  else if((ref.family||'').split('-')[0]===(cur.family||'').split('-')[0]) w+=2;
+function closeness(a,b){
+  if(!(a>0) || !(b>0)) return null;
+  return Math.min(a,b)/Math.max(a,b);
+}
 
-  if(ref.wall>0 && cur.wall>0){
-    const ratio=Math.min(ref.wall,cur.wall)/Math.max(ref.wall,cur.wall);
-    w+=4*ratio;
-  }
-  if(ref.volume>0 && cur.volume>0){
-    const ratio=Math.min(ref.volume,cur.volume)/Math.max(ref.volume,cur.volume);
-    w+=2*ratio;
-  }
-  if(ref.shut>0 && cur.shut>0){
-    const ratio=Math.min(ref.shut,cur.shut)/Math.max(ref.shut,cur.shut);
-    w+=2*ratio;
-  }
-  if(ref.feed===cur.feed) w+=1.5;
-  if(ref.insert===cur.insert) w+=1;
-  if(ref.removal===cur.removal) w+=1;
-  if(ref.cav===cur.cav) w+=0.5;
-  return w;
+function refWeight(ref,cur){
+  let score=0, possible=0;
+
+  possible+=5;
+  if(ref.family===cur.family) score+=5;
+  else if((ref.family||'').split('-')[0]===(cur.family||'').split('-')[0]) score+=2;
+
+  const metrics=[
+    ['wall',5],
+    ['mass',4],
+    ['shut',3],
+    ['shot',2],
+    ['volume',1.5]
+  ];
+  metrics.forEach(([key,w])=>{
+    if(ref[key]>0 && cur[key]>0){
+      possible+=w;
+      score+=w*closeness(ref[key],cur[key]);
+    }
+  });
+
+  if(ref.cav>0 && cur.cav>0){possible+=1; if(ref.cav===cur.cav)score+=1}
+  if(ref.feed && cur.feed){possible+=1; if(ref.feed===cur.feed)score+=1}
+  if(ref.insert && cur.insert){possible+=0.5; if(ref.insert===cur.insert)score+=0.5}
+  if(ref.removal && cur.removal){possible+=0.5; if(ref.removal===cur.removal)score+=0.5}
+
+  // Rich actual process data increases trust, but not similarity by itself.
+  const richness=['cooling','recovery','fill','pack','eject'].filter(k=>ref[k]>0).length;
+  const richnessBoost=1 + richness*0.08;
+
+  const normalized=possible>0 ? score/possible : 0;
+  return normalized*10*richnessBoost;
 }
 
 function getRefs(){
-  try{return JSON.parse(localStorage.getItem('cycleRefsV6')||localStorage.getItem('cycleRefsV5')||localStorage.getItem('cycleRefsV4')||'[]')}catch{return[]}
+  try{return JSON.parse(localStorage.getItem('cycleRefsV7')||localStorage.getItem('cycleRefsV6')||localStorage.getItem('cycleRefsV5')||localStorage.getItem('cycleRefsV4')||'[]')}catch{return[]}
 }
-function setRefs(r){localStorage.setItem('cycleRefsV6',JSON.stringify(r));renderRefs()}
+function setRefs(r){localStorage.setItem('cycleRefsV7',JSON.stringify(r));renderRefs()}
 
-function calibratedCycle(base){
-  let estimates=[{value:base,weight:6}];
-  const cur=currentCycleSignature();
-  const refs=getRefs().map(r=>({r,w:refWeight(r,cur)})).filter(x=>x.w>=5).sort((a,b)=>b.w-a.w).slice(0,5);
-  refs.forEach(x=>estimates.push({value:x.r.actual,weight:x.w}));
+function activeComparisonRef(){
+  if(!q('tCompareToggle').checked || !(num('tCompareCycle')>0)) return null;
+  const mat=q('tRefMaterial').value || q('tMaterial').value;
+  return {
+    name:q('tRefName').value.trim()||'Current comparison',
+    material:mat,
+    family:materials[mat]?.family||'',
+    actual:num('tCompareCycle'),
+    wall:num('tRefWall')*25.4,
+    mass:num('tRefMass'),
+    shut:num('tRefShut')*25.4,
+    shot:num('tRefShot'),
+    cav:num('tRefCav'),
+    cooling:num('tRefCooling'),
+    recovery:num('tRefRecovery'),
+    fill:num('tRefFill'),
+    pack:num('tRefPack'),
+    eject:num('tRefEject')
+  };
+}
 
-  if(q('tCompareToggle').checked && num('tCompareCycle')>0){
-    const factor={high:8,medium:4,low:2}[q('tCompareSimilarity').value]||4;
-    estimates.push({value:num('tCompareCycle'),weight:factor});
+function componentCalibrations(cur){
+  const candidates=[...getRefs()];
+  const active=activeComparisonRef();
+  if(active) candidates.unshift(active);
+
+  const weighted=candidates
+    .map(r=>({r,w:refWeight(r,cur)}))
+    .filter(x=>x.w>=4.0)
+    .sort((a,b)=>b.w-a.w)
+    .slice(0,6);
+
+  function weightedRatio(field, baselineField){
+    const usable=weighted.filter(x=>x.r[field]>0 && x.r[baselineField]>0);
+    if(!usable.length) return null;
+    let sw=0, sr=0;
+    usable.forEach(x=>{sw+=x.w; sr+=(x.r[field]/x.r[baselineField])*x.w});
+    return sr/sw;
   }
 
+  return {weighted, count:weighted.length};
+}
+
+function calibratedCycle(base, breakdown){
+  const cur=currentCycleSignature();
+  const refs=[...getRefs()];
+  const active=activeComparisonRef();
+  if(active) refs.unshift(active);
+
+  const weighted=refs.map(r=>({r,w:refWeight(r,cur)}))
+    .filter(x=>x.w>=4.0)
+    .sort((a,b)=>b.w-a.w)
+    .slice(0,6);
+
+  // Start with physics/geometry baseline.
+  let estimates=[{value:base,weight:7,source:'baseline'}];
+
+  // Actual total cycles are strong evidence.
+  weighted.forEach(x=>{
+    if(x.r.actual>0) estimates.push({value:x.r.actual,weight:x.w,source:'actual'});
+  });
+
   const totalW=estimates.reduce((s,x)=>s+x.weight,0);
-  const value=estimates.reduce((s,x)=>s+x.value*x.weight,0)/totalW;
-  return {value,refsUsed:refs.length};
+  let value=estimates.reduce((s,x)=>s+x.value*x.weight,0)/totalW;
+
+  // If detailed component data exists, use it to nudge specific pieces rather than only the total.
+  const compFields=[
+    ['cooling',breakdown.cooling],
+    ['fill',breakdown.fill],
+    ['pack',breakdown.pack],
+    ['eject',breakdown.eject]
+  ];
+
+  let compDelta=0, compWeight=0;
+  compFields.forEach(([field,modelValue])=>{
+    const usable=weighted.filter(x=>x.r[field]>0);
+    if(!usable.length || !(modelValue>=0)) return;
+    let sw=0, sv=0;
+    usable.forEach(x=>{sw+=x.w; sv+=x.r[field]*x.w});
+    const empirical=sv/sw;
+    // Moderate correction; preserve quote-stage physics as the anchor.
+    compDelta += (empirical-modelValue)*0.45;
+    compWeight += 1;
+  });
+
+  if(compWeight>0) value += compDelta;
+
+  return {value, refsUsed:weighted.filter(x=>getRefs().includes(x.r)).length, totalComparables:weighted.length};
 }
 
 function cycle(){
@@ -466,8 +588,12 @@ function cycle(){
   const controllingCool=Math.max(partCool,runnerCool);
   const fillHold=estimateFillHoldSeconds();
   const motion=estimateMotionSeconds();
+  // Quote-stage split for reference calibration. These are still estimates.
+  const estFill=fillHold*0.38;
+  const estPack=fillHold*0.62;
+  const estEject=motion;
   const baseline=controllingCool+fillHold+motion;
-  const cal=calibratedCycle(baseline);
+  const cal=calibratedCycle(baseline,{cooling:controllingCool,fill:estFill,pack:estPack,eject:estEject});
   const adjusted=cal.value;
 
   let uncertainty=0.20;
@@ -495,7 +621,7 @@ function cycle(){
   let confidence='Low';
   if(num('tVolume')>0 && num('tShut')>0 && feed!=='unknown') confidence='Medium';
   if(cal.refsUsed>=2 && num('tVolume')>0 && num('tShut')>0) confidence='High';
-  q('tConfidence').textContent=`Confidence: ${confidence}. ${cal.refsUsed} saved comparable reference job${cal.refsUsed===1?'':'s'} used.`;
+  q('tConfidence').textContent=`Confidence: ${confidence}. ${cal.refsUsed} saved reference job${cal.refsUsed===1?'':'s'} plus ${Math.max(0,cal.totalComparables-cal.refsUsed)} current comparison${Math.max(0,cal.totalComparables-cal.refsUsed)===1?'':'s'} used.`;
   save();
 }
 
@@ -508,16 +634,16 @@ q('tFeedConcept').addEventListener('change',()=>{
   cycle();
 });
 q('tAdvancedOverride').addEventListener('change',()=>{q('tOverrideBox').classList.toggle('hidden',!q('tAdvancedOverride').checked);cycle()});
-q('tCompareToggle').addEventListener('change',()=>{q('tCompareBox').classList.toggle('hidden',!q('tCompareToggle').checked);cycle()});
+q('tCompareToggle').addEventListener('change',()=>{q('tCompareBox').classList.toggle('hidden',!q('tCompareToggle').checked);if(q('tCompareToggle').checked && !q('tRefMaterial').value)q('tRefMaterial').value=q('tMaterial').value;cycle()});
 
-['tLen','tWid','tShut','tVolume','tCav','tRunnerDia','tMeltTemp','tMoldTemp','tEjectTemp','tAlpha','tFillOverride','tMotionOverride','tCompareCycle'].forEach(id=>q(id).addEventListener('input',cycle));
-['tDimUnit','tVolumeUnit','tInsert','tRemoval','tCompareSimilarity'].forEach(id=>q(id).addEventListener('change',cycle));
+['tLen','tWid','tShut','tVolume','tPartMass','tCav','tRunnerDia','tMeltTemp','tMoldTemp','tEjectTemp','tAlpha','tFillOverride','tMotionOverride','tCompareCycle','tRefWall','tRefMass','tRefShut','tRefShot','tRefCav','tRefCooling','tRefRecovery','tRefFill','tRefPack','tRefEject'].forEach(id=>q(id).addEventListener('input',cycle));
+['tDimUnit','tVolumeUnit','tInsert','tRemoval','tRefMaterial'].forEach(id=>q(id).addEventListener('change',cycle));
 
 q('tReset').addEventListener('click',()=>{
   q('tMaterial').value='PP — Unfilled';q('tWall').value='';q('tWallUnit').value='mm';
-  ['tLen','tWid','tShut','tVolume','tRunnerDia','tCompareCycle','tRefName','tFillOverride','tMotionOverride'].forEach(id=>q(id).value='');
+  ['tLen','tWid','tShut','tVolume','tPartMass','tRunnerDia','tCompareCycle','tRefName','tRefWall','tRefMass','tRefShut','tRefShot','tRefCav','tRefCooling','tRefRecovery','tRefFill','tRefPack','tRefEject','tFillOverride','tMotionOverride'].forEach(id=>q(id).value='');
   q('tDimUnit').value='mm';q('tVolumeUnit').value='cm3';q('tCav').value='1';
-  q('tFeedConcept').value='valve_direct';q('tColdRunnerBox').classList.add('hidden');
+  q('tFeedConcept').value='valve_direct';q('tRefMaterial').value='PP — Unfilled';q('tColdRunnerBox').classList.add('hidden');
   q('tInsert').value='no';q('tRemoval').value='drop';
   q('tAdvancedOverride').checked=false;q('tOverrideBox').classList.add('hidden');
   q('tCompareToggle').checked=false;q('tCompareBox').classList.add('hidden');
@@ -525,19 +651,31 @@ q('tReset').addEventListener('click',()=>{
 });
 
 q('tApplyKnown').addEventListener('click',()=>{
-  const actual=num('tCompareCycle');
-  const wall=mm(num('tWall'),q('tWallUnit').value);
-  if(!actual){q('tRefStatus').textContent='Enter the actual cycle time first.';return}
+  const ref=activeComparisonRef();
+  if(!ref || !(ref.actual>0)){
+    q('tRefStatus').textContent='Enter the actual cycle time first.';
+    return;
+  }
+
   if(q('tSaveCompare').checked){
-    if(!wall){q('tRefStatus').textContent='Enter wall thickness before saving this as a reference.';return}
-    const sig=currentCycleSignature();
-    const ref={...sig,actual,name:q('tRefName').value.trim()||'Unnamed reference',saved:new Date().toISOString()};
-    const refs=getRefs();refs.unshift(ref);setRefs(refs.slice(0,50));
-    q('tRefStatus').textContent=`Applied and saved: ${ref.name} — ${fmt1.format(actual)} sec`;
+    const refs=getRefs();
+    ref.saved=new Date().toISOString();
+    refs.unshift(ref);
+    setRefs(refs.slice(0,75));
+    q('tRefStatus').textContent=`Applied and saved: ${ref.name} — ${fmt1.format(ref.actual)} sec`;
   }else{
-    q('tRefStatus').textContent=`Applied ${fmt1.format(actual)} sec to this estimate only.`;
+    q('tRefStatus').textContent=`Applied ${fmt1.format(ref.actual)} sec to this estimate only.`;
   }
   cycle();
+});
+
+q('tClearCompare').addEventListener('click',()=>{
+  ['tRefName','tCompareCycle','tRefWall','tRefMass','tRefShut','tRefShot','tRefCav','tRefCooling','tRefRecovery','tRefFill','tRefPack','tRefEject'].forEach(id=>q(id).value='');
+  q('tRefMaterial').value=q('tMaterial').value;
+  q('tSaveCompare').checked=false;
+  q('tRefStatus').textContent='';
+  cycle();
+  save();
 });
 
 q('tClearRefs').addEventListener('click',()=>{
@@ -549,10 +687,21 @@ q('tClearRefs').addEventListener('click',()=>{
 function renderRefs(){
   const box=q('tRefList');box.innerHTML='';
   const refs=getRefs();
-  if(!refs.length){box.innerHTML='<div class="muted">No saved reference jobs yet.</div>';return}
-  refs.slice(0,8).forEach(r=>{
+  if(!refs.length){box.innerHTML='<div class="muted">No saved reference jobs yet. They will build up naturally as you quote new work.</div>';return}
+  refs.slice(0,10).forEach(r=>{
+    const details=[];
+    if(r.wall>0) details.push(`wall ${(r.wall/25.4).toFixed(3)} in`);
+    if(r.mass>0) details.push(`${fmt1.format(r.mass)} g part`);
+    if(r.shut>0) details.push(`shut ${(r.shut/25.4).toFixed(3)} in`);
+    if(r.shot>0) details.push(`${fmt1.format(r.shot)} g shot`);
+    if(r.cooling>0) details.push(`cool ${fmt1.format(r.cooling)} s`);
+    if(r.fill>0) details.push(`fill ${fmt1.format(r.fill)} s`);
+    if(r.pack>0) details.push(`pack/hold ${fmt1.format(r.pack)} s`);
+    if(r.recovery>0) details.push(`recovery ${fmt1.format(r.recovery)} s`);
+    if(r.eject>0) details.push(`eject ${fmt1.format(r.eject)} s`);
+
     const div=document.createElement('div');div.className='ref-item';
-    div.innerHTML=`<strong>${r.name}</strong> — ${fmt1.format(r.actual)} sec<br><span class="muted">${r.material}; wall ${fmt2.format(r.wall)} mm; volume ${r.volume?fmt1.format(r.volume)+' cm³':'—'}; part shut ${r.shut?fmt1.format(r.shut)+' mm':'—'}; ${r.feed||'legacy feed setup'}; ${r.removal==='robot_all'?'robot picks parts + runner':r.removal==='robot_parts'?'robot picks parts only':'free drop'}${r.insert==='yes'?'; insert overmold':''}</span>`;
+    div.innerHTML=`<strong>${r.name||'Unnamed reference'}</strong> — ${fmt1.format(r.actual)} sec<br><span class="muted">${r.material||r.family||'Unknown resin'}${details.length?'; '+details.join('; '):''}</span>`;
     box.appendChild(div);
   });
 }
@@ -635,10 +784,10 @@ q('rTargetPct').addEventListener('change',()=>{
 q('rTargetUnit').addEventListener('change',runnerTarget);
 q('rTargetReset').addEventListener('click',()=>{q('rTargetPart').value='';q('rTargetCav').value='';q('rTargetPct').value='20';q('rCustomPct').value='';q('rCustomPctBox').classList.add('hidden');runnerTarget();save()});
 
-const fields=['pCycle','pCav','pPartMass','pRunnerMass','cMaterial','cArea','cAreaUnit','cCav','cRunnerArea','cRunnerAreaUnit','cSafety','cPress','cManualFactor','tMaterial','tWall','tWallUnit','tLen','tWid','tShut','tDimUnit','tVolume','tVolumeUnit','tCav','tFeedConcept','tRunnerDia','tMeltTemp','tMoldTemp','tEjectTemp','tAlpha','tInsert','tRemoval','tFillOverride','tMotionOverride','tCompareCycle','tCompareSimilarity','tRefName','aPan','aPanParts','aPanAsh','rKnownUnit','rKnownPart','rKnownCav','rKnownRunner','rTargetUnit','rTargetPart','rTargetCav','rTargetPct','rCustomPct'];
-function save(){const d={};fields.forEach(id=>d[id]=q(id).value);d.cManualToggle=q('cManualToggle').checked;d.runnerMode=q('rModeTarget').checked?'target':'known';d.tAdvancedOverride=q('tAdvancedOverride').checked;d.tCompareToggle=q('tCompareToggle').checked;d.tSaveCompare=q('tSaveCompare').checked;localStorage.setItem('moldingCalcV6',JSON.stringify(d))}
-function restore(){try{let raw=localStorage.getItem('moldingCalcV6');if(!raw)raw=localStorage.getItem('moldingCalcV5');if(!raw)raw=localStorage.getItem('moldingCalcV4');if(!raw)raw=localStorage.getItem('moldingCalcV3');if(!raw)raw=localStorage.getItem('moldingCalcV2');const d=JSON.parse(raw||'{}');fields.forEach(id=>{if(d[id]!==undefined)q(id).value=d[id]});if(d.cManualToggle!==undefined){q('cManualToggle').checked=!!d.cManualToggle;q('cManualBox').classList.toggle('hidden',!q('cManualToggle').checked)}if(d.runnerMode==='target')q('rModeTarget').checked=true;else q('rModeKnown').checked=true;q('rCustomPctBox').classList.toggle('hidden',q('rTargetPct').value!=='custom');q('tAdvancedOverride').checked=!!d.tAdvancedOverride;q('tOverrideBox').classList.toggle('hidden',!q('tAdvancedOverride').checked);q('tCompareToggle').checked=!!d.tCompareToggle;q('tCompareBox').classList.toggle('hidden',!q('tCompareToggle').checked);q('tSaveCompare').checked=!!d.tSaveCompare}catch{}}
-restore();clampHint();cycleMaterialDefaults(false);if(!q('tMeltTemp').value||!q('tAlpha').value)cycleMaterialDefaults(true);q('tColdRunnerBox').classList.toggle('hidden',!['hot_cold','cold_runner'].includes(q('tFeedConcept').value));prod();clamp();cycle();ash();runnerMode();runnerKnown();runnerTarget();renderRefs();
+const fields=['pCycle','pCav','pPartMass','pRunnerMass','cMaterial','cArea','cAreaUnit','cCav','cRunnerArea','cRunnerAreaUnit','cSafety','cPress','cManualFactor','tMaterial','tWall','tWallUnit','tLen','tWid','tShut','tDimUnit','tVolume','tVolumeUnit','tPartMass','tCav','tFeedConcept','tRunnerDia','tMeltTemp','tMoldTemp','tEjectTemp','tAlpha','tInsert','tRemoval','tFillOverride','tMotionOverride','tCompareCycle','tRefName','tRefMaterial','tRefWall','tRefMass','tRefShut','tRefShot','tRefCav','tRefCooling','tRefRecovery','tRefFill','tRefPack','tRefEject','aPan','aPanParts','aPanAsh','rKnownUnit','rKnownPart','rKnownCav','rKnownRunner','rTargetUnit','rTargetPart','rTargetCav','rTargetPct','rCustomPct'];
+function save(){const d={};fields.forEach(id=>d[id]=q(id).value);d.cManualToggle=q('cManualToggle').checked;d.runnerMode=q('rModeTarget').checked?'target':'known';d.tAdvancedOverride=q('tAdvancedOverride').checked;d.tCompareToggle=q('tCompareToggle').checked;d.tSaveCompare=q('tSaveCompare').checked;localStorage.setItem('moldingCalcV7',JSON.stringify(d))}
+function restore(){try{let raw=localStorage.getItem('moldingCalcV7');if(!raw)raw=localStorage.getItem('moldingCalcV6');if(!raw)raw=localStorage.getItem('moldingCalcV5');if(!raw)raw=localStorage.getItem('moldingCalcV4');if(!raw)raw=localStorage.getItem('moldingCalcV3');if(!raw)raw=localStorage.getItem('moldingCalcV2');const d=JSON.parse(raw||'{}');fields.forEach(id=>{if(d[id]!==undefined)q(id).value=d[id]});if(d.cManualToggle!==undefined){q('cManualToggle').checked=!!d.cManualToggle;q('cManualBox').classList.toggle('hidden',!q('cManualToggle').checked)}if(d.runnerMode==='target')q('rModeTarget').checked=true;else q('rModeKnown').checked=true;q('rCustomPctBox').classList.toggle('hidden',q('rTargetPct').value!=='custom');q('tAdvancedOverride').checked=!!d.tAdvancedOverride;q('tOverrideBox').classList.toggle('hidden',!q('tAdvancedOverride').checked);q('tCompareToggle').checked=!!d.tCompareToggle;q('tCompareBox').classList.toggle('hidden',!q('tCompareToggle').checked);q('tSaveCompare').checked=!!d.tSaveCompare}catch{}}
+restore();if(!q('tRefMaterial').value)q('tRefMaterial').value=q('tMaterial').value;clampHint();cycleMaterialDefaults(false);if(!q('tMeltTemp').value||!q('tAlpha').value)cycleMaterialDefaults(true);q('tColdRunnerBox').classList.toggle('hidden',!['hot_cold','cold_runner'].includes(q('tFeedConcept').value));prod();clamp();cycle();ash();runnerMode();runnerKnown();runnerTarget();renderRefs();
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
 </script>
 </body></html>
