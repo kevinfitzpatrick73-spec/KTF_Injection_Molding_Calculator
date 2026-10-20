@@ -88,7 +88,6 @@ input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--
 
 <div id="tColdRunnerBox" class="grid hidden" style="margin-top:10px">
 <div><label for="tRunnerDia">Approx. largest cold-runner / sprue diameter (mm)</label><input id="tRunnerDia" type="number" min="0" step="0.1" inputmode="decimal" placeholder="optional"><span class="hint">Leave blank if unknown. The app will use a conservative estimate.</span></div>
-<div><label for="tRunnerHandling">Runner handling</label><select id="tRunnerHandling"><option value="drop">Drops free</option><option value="robot">Robot picked</option><option value="unknown">Unknown</option></select></div>
 </div>
 
 <h3 class="section-title" style="margin-top:16px">Processing Assumptions</h3>
@@ -102,7 +101,14 @@ input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--
 <h3 class="section-title" style="margin-top:16px">Handling</h3>
 <div class="grid">
 <div><label for="tInsert">Over-molded metal component inserted?</label><select id="tInsert"><option value="no">No</option><option value="yes">Yes</option></select></div>
-<div><label for="tPartHandling">Finished molded part</label><select id="tPartHandling"><option value="drop">Drops free</option><option value="robot">Robot picked</option></select></div>
+<div><label for="tRemoval">Part / runner removal method</label>
+<select id="tRemoval">
+<option value="drop">Free drop</option>
+<option value="robot_all">Robot picks parts + runner together</option>
+<option value="robot_parts">Robot picks parts only</option>
+</select>
+<span class="hint">Use “parts only” mainly for hot-runner/direct-gate jobs with no cold runner.</span>
+</div>
 </div>
 
 <div class="toggle" style="margin-top:12px"><input id="tAdvancedOverride" type="checkbox"><label for="tAdvancedOverride" style="margin:0">Override estimated non-cooling times</label></div>
@@ -133,25 +139,21 @@ input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--
 </div>
 
 <div class="card">
-<h2 class="section-title">Compare With a Similar Known Part</h2>
-<div class="toggle"><input id="tCompareToggle" type="checkbox"><label for="tCompareToggle" style="margin:0">I have a cycle time from a similar part</label></div>
-<div id="tCompareBox" class="grid hidden" style="margin-top:10px">
-<div><label for="tCompareCycle">Known cycle (sec)</label><input id="tCompareCycle" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 43"></div>
-<div><label for="tCompareSimilarity">How similar is it?</label><select id="tCompareSimilarity"><option value="high">Very similar</option><option value="medium" selected>Somewhat similar</option><option value="low">Loose comparison</option></select></div>
-</div>
-<p class="note">This adjusts the current estimate only. It becomes permanent reference data only if you save the current setup below.</p>
-</div>
-
-<div class="card">
-<h2 class="section-title">BRI Reference Jobs</h2>
+<h2 class="section-title">Known Similar Part / BRI Reference</h2>
+<div class="toggle"><input id="tCompareToggle" type="checkbox"><label for="tCompareToggle" style="margin:0">I have an actual cycle from a similar part</label></div>
+<div id="tCompareBox" class="hidden" style="margin-top:10px">
 <div class="grid">
-<div><label for="tActualCycle">Actual cycle for this setup (sec)</label><input id="tActualCycle" type="number" min="0" step="0.1" inputmode="decimal" placeholder="Enter after trial / production"></div>
+<div><label for="tCompareCycle">Actual cycle (sec)</label><input id="tCompareCycle" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 43"></div>
+<div><label for="tCompareSimilarity">How similar is it?</label><select id="tCompareSimilarity"><option value="high">Very similar</option><option value="medium" selected>Somewhat similar</option><option value="low">Loose comparison</option></select></div>
 <div><label for="tRefName">Reference name / note</label><input id="tRefName" type="text" maxlength="60" placeholder="e.g. PA6 housing"></div>
 </div>
-<div class="actions"><button id="tSaveRef" type="button" style="background:var(--accent);color:#fff">Save Current Setup</button><button id="tClearRefs" class="secondary" type="button">Clear All References</button></div>
+<div class="toggle" style="margin-top:10px"><input id="tSaveCompare" type="checkbox"><label for="tSaveCompare" style="margin:0">Save this as a BRI reference job for future estimates</label></div>
+<div class="actions"><button id="tApplyKnown" type="button" style="background:var(--accent);color:#fff">Apply Known Cycle</button></div>
 <div id="tRefStatus" class="hint" style="margin-top:8px"></div>
+</div>
 <div id="tRefList" class="ref-list"></div>
-<p class="note">Saved references stay on this browser/device. The calibration weights references by material family, wall thickness, resin volume, part shut height, feed-system concept, insert use, and part handling.</p>
+<div class="actions"><button id="tClearRefs" class="secondary" type="button">Clear Saved References</button></div>
+<p class="note">A known cycle can adjust the current quote without being saved. Check “Save this as a BRI reference job” when you want the app to use that job automatically in future estimates.</p>
 </div>
 
 <div class="card">
@@ -310,7 +312,7 @@ function coolingTime(thicknessMm, alpha, melt, mold, eject){
 function estimatedOpenClearanceMm(){
   const shut=dimToMm(num('tShut'),q('tDimUnit').value);
   if(!shut) return 0;
-  if(q('tPartHandling').value==='robot'){
+  if(q('tRemoval').value!=='drop'){
     return shut + Math.max(100, shut*1.25);
   }
   return shut + Math.max(50, shut*0.65);
@@ -322,11 +324,11 @@ function estimateMotionSeconds(){
   let motion=2.0;
   if(clearance>0) motion += clearance/180;
   motion += 0.7; // eject event
-  if(q('tPartHandling').value==='robot') motion += 1.0;
+  if(q('tRemoval').value!=='drop') motion += 1.0;
   if(q('tInsert').value==='yes') motion += 2.5;
 
   const feed=q('tFeedConcept').value;
-  if((feed==='hot_cold' || feed==='cold_runner') && q('tRunnerHandling').value==='robot') motion += 0.5;
+  
   return motion;
 }
 
@@ -388,7 +390,7 @@ function currentCycleSignature(){
     cav:Math.max(1,num('tCav')),
     feed:q('tFeedConcept').value,
     insert:q('tInsert').value,
-    handling:q('tPartHandling').value
+    removal:q('tRemoval').value
   };
 }
 
@@ -411,15 +413,15 @@ function refWeight(ref,cur){
   }
   if(ref.feed===cur.feed) w+=1.5;
   if(ref.insert===cur.insert) w+=1;
-  if(ref.handling===cur.handling) w+=1;
+  if(ref.removal===cur.removal) w+=1;
   if(ref.cav===cur.cav) w+=0.5;
   return w;
 }
 
 function getRefs(){
-  try{return JSON.parse(localStorage.getItem('cycleRefsV5')||localStorage.getItem('cycleRefsV4')||'[]')}catch{return[]}
+  try{return JSON.parse(localStorage.getItem('cycleRefsV6')||localStorage.getItem('cycleRefsV5')||localStorage.getItem('cycleRefsV4')||'[]')}catch{return[]}
 }
-function setRefs(r){localStorage.setItem('cycleRefsV5',JSON.stringify(r));renderRefs()}
+function setRefs(r){localStorage.setItem('cycleRefsV6',JSON.stringify(r));renderRefs()}
 
 function calibratedCycle(base){
   let estimates=[{value:base,weight:6}];
@@ -509,28 +511,33 @@ q('tAdvancedOverride').addEventListener('change',()=>{q('tOverrideBox').classLis
 q('tCompareToggle').addEventListener('change',()=>{q('tCompareBox').classList.toggle('hidden',!q('tCompareToggle').checked);cycle()});
 
 ['tLen','tWid','tShut','tVolume','tCav','tRunnerDia','tMeltTemp','tMoldTemp','tEjectTemp','tAlpha','tFillOverride','tMotionOverride','tCompareCycle'].forEach(id=>q(id).addEventListener('input',cycle));
-['tDimUnit','tVolumeUnit','tRunnerHandling','tInsert','tPartHandling','tCompareSimilarity'].forEach(id=>q(id).addEventListener('change',cycle));
+['tDimUnit','tVolumeUnit','tInsert','tRemoval','tCompareSimilarity'].forEach(id=>q(id).addEventListener('change',cycle));
 
 q('tReset').addEventListener('click',()=>{
   q('tMaterial').value='PP — Unfilled';q('tWall').value='';q('tWallUnit').value='mm';
-  ['tLen','tWid','tShut','tVolume','tRunnerDia','tCompareCycle','tActualCycle','tRefName','tFillOverride','tMotionOverride'].forEach(id=>q(id).value='');
+  ['tLen','tWid','tShut','tVolume','tRunnerDia','tCompareCycle','tRefName','tFillOverride','tMotionOverride'].forEach(id=>q(id).value='');
   q('tDimUnit').value='mm';q('tVolumeUnit').value='cm3';q('tCav').value='1';
   q('tFeedConcept').value='valve_direct';q('tColdRunnerBox').classList.add('hidden');
-  q('tInsert').value='no';q('tPartHandling').value='drop';
+  q('tInsert').value='no';q('tRemoval').value='drop';
   q('tAdvancedOverride').checked=false;q('tOverrideBox').classList.add('hidden');
   q('tCompareToggle').checked=false;q('tCompareBox').classList.add('hidden');
   cycleMaterialDefaults(true);save();
 });
 
-q('tSaveRef').addEventListener('click',()=>{
-  const actual=num('tActualCycle');
+q('tApplyKnown').addEventListener('click',()=>{
+  const actual=num('tCompareCycle');
   const wall=mm(num('tWall'),q('tWallUnit').value);
-  if(!actual || !wall){q('tRefStatus').textContent='Enter wall thickness and an actual cycle before saving.';return}
-  const sig=currentCycleSignature();
-  const ref={...sig,actual,name:q('tRefName').value.trim()||'Unnamed reference',saved:new Date().toISOString()};
-  const refs=getRefs();refs.unshift(ref);setRefs(refs.slice(0,50));
-  q('tRefStatus').textContent=`Saved: ${ref.name} — ${fmt1.format(actual)} sec`;
-  q('tActualCycle').value='';q('tRefName').value='';cycle();
+  if(!actual){q('tRefStatus').textContent='Enter the actual cycle time first.';return}
+  if(q('tSaveCompare').checked){
+    if(!wall){q('tRefStatus').textContent='Enter wall thickness before saving this as a reference.';return}
+    const sig=currentCycleSignature();
+    const ref={...sig,actual,name:q('tRefName').value.trim()||'Unnamed reference',saved:new Date().toISOString()};
+    const refs=getRefs();refs.unshift(ref);setRefs(refs.slice(0,50));
+    q('tRefStatus').textContent=`Applied and saved: ${ref.name} — ${fmt1.format(actual)} sec`;
+  }else{
+    q('tRefStatus').textContent=`Applied ${fmt1.format(actual)} sec to this estimate only.`;
+  }
+  cycle();
 });
 
 q('tClearRefs').addEventListener('click',()=>{
@@ -545,7 +552,7 @@ function renderRefs(){
   if(!refs.length){box.innerHTML='<div class="muted">No saved reference jobs yet.</div>';return}
   refs.slice(0,8).forEach(r=>{
     const div=document.createElement('div');div.className='ref-item';
-    div.innerHTML=`<strong>${r.name}</strong> — ${fmt1.format(r.actual)} sec<br><span class="muted">${r.material}; wall ${fmt2.format(r.wall)} mm; volume ${r.volume?fmt1.format(r.volume)+' cm³':'—'}; part shut ${r.shut?fmt1.format(r.shut)+' mm':'—'}; ${r.feed||'legacy feed setup'}; ${r.handling==='robot'?'robot pick':'free drop'}${r.insert==='yes'?'; insert overmold':''}</span>`;
+    div.innerHTML=`<strong>${r.name}</strong> — ${fmt1.format(r.actual)} sec<br><span class="muted">${r.material}; wall ${fmt2.format(r.wall)} mm; volume ${r.volume?fmt1.format(r.volume)+' cm³':'—'}; part shut ${r.shut?fmt1.format(r.shut)+' mm':'—'}; ${r.feed||'legacy feed setup'}; ${r.removal==='robot_all'?'robot picks parts + runner':r.removal==='robot_parts'?'robot picks parts only':'free drop'}${r.insert==='yes'?'; insert overmold':''}</span>`;
     box.appendChild(div);
   });
 }
@@ -628,9 +635,9 @@ q('rTargetPct').addEventListener('change',()=>{
 q('rTargetUnit').addEventListener('change',runnerTarget);
 q('rTargetReset').addEventListener('click',()=>{q('rTargetPart').value='';q('rTargetCav').value='';q('rTargetPct').value='20';q('rCustomPct').value='';q('rCustomPctBox').classList.add('hidden');runnerTarget();save()});
 
-const fields=['pCycle','pCav','pPartMass','pRunnerMass','cMaterial','cArea','cAreaUnit','cCav','cRunnerArea','cRunnerAreaUnit','cSafety','cPress','cManualFactor','tMaterial','tWall','tWallUnit','tLen','tWid','tShut','tDimUnit','tVolume','tVolumeUnit','tCav','tFeedConcept','tRunnerDia','tRunnerHandling','tMeltTemp','tMoldTemp','tEjectTemp','tAlpha','tInsert','tPartHandling','tFillOverride','tMotionOverride','tCompareCycle','tCompareSimilarity','aPan','aPanParts','aPanAsh','rKnownUnit','rKnownPart','rKnownCav','rKnownRunner','rTargetUnit','rTargetPart','rTargetCav','rTargetPct','rCustomPct'];
-function save(){const d={};fields.forEach(id=>d[id]=q(id).value);d.cManualToggle=q('cManualToggle').checked;d.runnerMode=q('rModeTarget').checked?'target':'known';d.tAdvancedOverride=q('tAdvancedOverride').checked;d.tCompareToggle=q('tCompareToggle').checked;localStorage.setItem('moldingCalcV5',JSON.stringify(d))}
-function restore(){try{let raw=localStorage.getItem('moldingCalcV5');if(!raw)raw=localStorage.getItem('moldingCalcV4');if(!raw)raw=localStorage.getItem('moldingCalcV3');if(!raw)raw=localStorage.getItem('moldingCalcV2');const d=JSON.parse(raw||'{}');fields.forEach(id=>{if(d[id]!==undefined)q(id).value=d[id]});if(d.cManualToggle!==undefined){q('cManualToggle').checked=!!d.cManualToggle;q('cManualBox').classList.toggle('hidden',!q('cManualToggle').checked)}if(d.runnerMode==='target')q('rModeTarget').checked=true;else q('rModeKnown').checked=true;q('rCustomPctBox').classList.toggle('hidden',q('rTargetPct').value!=='custom');q('tAdvancedOverride').checked=!!d.tAdvancedOverride;q('tOverrideBox').classList.toggle('hidden',!q('tAdvancedOverride').checked);q('tCompareToggle').checked=!!d.tCompareToggle;q('tCompareBox').classList.toggle('hidden',!q('tCompareToggle').checked)}catch{}}
+const fields=['pCycle','pCav','pPartMass','pRunnerMass','cMaterial','cArea','cAreaUnit','cCav','cRunnerArea','cRunnerAreaUnit','cSafety','cPress','cManualFactor','tMaterial','tWall','tWallUnit','tLen','tWid','tShut','tDimUnit','tVolume','tVolumeUnit','tCav','tFeedConcept','tRunnerDia','tMeltTemp','tMoldTemp','tEjectTemp','tAlpha','tInsert','tRemoval','tFillOverride','tMotionOverride','tCompareCycle','tCompareSimilarity','tRefName','aPan','aPanParts','aPanAsh','rKnownUnit','rKnownPart','rKnownCav','rKnownRunner','rTargetUnit','rTargetPart','rTargetCav','rTargetPct','rCustomPct'];
+function save(){const d={};fields.forEach(id=>d[id]=q(id).value);d.cManualToggle=q('cManualToggle').checked;d.runnerMode=q('rModeTarget').checked?'target':'known';d.tAdvancedOverride=q('tAdvancedOverride').checked;d.tCompareToggle=q('tCompareToggle').checked;d.tSaveCompare=q('tSaveCompare').checked;localStorage.setItem('moldingCalcV6',JSON.stringify(d))}
+function restore(){try{let raw=localStorage.getItem('moldingCalcV6');if(!raw)raw=localStorage.getItem('moldingCalcV5');if(!raw)raw=localStorage.getItem('moldingCalcV4');if(!raw)raw=localStorage.getItem('moldingCalcV3');if(!raw)raw=localStorage.getItem('moldingCalcV2');const d=JSON.parse(raw||'{}');fields.forEach(id=>{if(d[id]!==undefined)q(id).value=d[id]});if(d.cManualToggle!==undefined){q('cManualToggle').checked=!!d.cManualToggle;q('cManualBox').classList.toggle('hidden',!q('cManualToggle').checked)}if(d.runnerMode==='target')q('rModeTarget').checked=true;else q('rModeKnown').checked=true;q('rCustomPctBox').classList.toggle('hidden',q('rTargetPct').value!=='custom');q('tAdvancedOverride').checked=!!d.tAdvancedOverride;q('tOverrideBox').classList.toggle('hidden',!q('tAdvancedOverride').checked);q('tCompareToggle').checked=!!d.tCompareToggle;q('tCompareBox').classList.toggle('hidden',!q('tCompareToggle').checked);q('tSaveCompare').checked=!!d.tSaveCompare}catch{}}
 restore();clampHint();cycleMaterialDefaults(false);if(!q('tMeltTemp').value||!q('tAlpha').value)cycleMaterialDefaults(true);q('tColdRunnerBox').classList.toggle('hidden',!['hot_cold','cold_runner'].includes(q('tFeedConcept').value));prod();clamp();cycle();ash();runnerMode();runnerKnown();runnerTarget();renderRefs();
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
 </script>
