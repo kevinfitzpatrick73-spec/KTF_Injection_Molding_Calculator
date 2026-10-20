@@ -56,7 +56,7 @@ input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--
 
 <section id="cycle" class="panel">
 <div class="card">
-<h2 class="section-title">Cycle Time Estimate</h2>
+<h2 class="section-title">Cycle Time Estimate — Quote Stage</h2>
 
 <div class="grid">
 <div><label for="tMaterial">Material</label><select id="tMaterial"></select></div>
@@ -67,38 +67,39 @@ input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--
 <div class="mini-grid">
 <div><label for="tLen">Part length</label><input id="tLen" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 180"></div>
 <div><label for="tWid">Part width</label><input id="tWid" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 120"></div>
-<div><label for="tHei">Part height</label><input id="tHei" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 35"></div>
+<div><label for="tShut">Part shut height</label><input id="tShut" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 35"><span class="hint">Approximate part dimension in the mold open/close direction.</span></div>
 </div>
 
 <div class="grid" style="margin-top:10px">
 <div><label for="tDimUnit">Part dimension units</label><select id="tDimUnit"><option value="mm">mm</option><option value="in">inches</option></select></div>
 <div><label>Resin volume per part</label><div class="inline"><input id="tVolume" type="number" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 50"><select id="tVolumeUnit" class="unit"><option value="cm3">cm³</option><option value="in3">in³</option></select></div></div>
 <div><label for="tCav">Cavitation</label><input id="tCav" type="number" min="1" step="1" inputmode="numeric" value="1"></div>
-<div><label for="tRunnerType">Feed system</label><select id="tRunnerType"><option value="hot">Hot runner / hot drop</option><option value="cold">Cold runner</option><option value="direct">Direct sprue / no separate runner</option></select></div>
+<div><label for="tFeedConcept">Feed-system concept</label>
+<select id="tFeedConcept">
+<option value="valve_direct">Valve gate direct to part</option>
+<option value="hot_direct">Hot drop direct to part</option>
+<option value="hot_cold">Hot drop to cold runner</option>
+<option value="cold_runner">Cold sprue / cold runner</option>
+<option value="unknown">Unknown / TBD</option>
+</select>
+<span class="hint">No need to define the final subgate, fan, banana, edge gate, etc.</span>
 </div>
-
-<h3 class="section-title" style="margin-top:16px">Mold Size / Opening</h3>
-<div class="grid">
-<div><label for="tShutHeight">Mold shut height</label><div class="inline"><input id="tShutHeight" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 18"><select id="tMoldDimUnit" class="unit"><option value="in">inches</option><option value="mm">mm</option></select></div><span class="hint">Overall mold thickness while closed.</span></div>
-<div><label for="tOpenStroke">Required mold opening stroke</label><div class="inline"><input id="tOpenStroke" type="number" min="0" step="0.1" inputmode="decimal" placeholder="auto-estimated"><span class="unit" style="padding:12px 4px">same unit</span></div><span class="hint">Leave blank to estimate from part height and handling method.</span></div>
 </div>
 
 <div id="tColdRunnerBox" class="grid hidden" style="margin-top:10px">
-<div><label for="tRunnerDia">Largest cold-runner diameter (mm)</label><input id="tRunnerDia" type="number" min="0" step="0.1" inputmode="decimal" placeholder="optional"><span class="hint">A thick runner can control cooling.</span></div>
-<div><label for="tRunnerHandling">Runner handling</label><select id="tRunnerHandling"><option value="drop">Drops free</option><option value="robot">Robot picked</option></select></div>
+<div><label for="tRunnerDia">Approx. largest cold-runner / sprue diameter (mm)</label><input id="tRunnerDia" type="number" min="0" step="0.1" inputmode="decimal" placeholder="optional"><span class="hint">Leave blank if unknown. The app will use a conservative estimate.</span></div>
+<div><label for="tRunnerHandling">Runner handling</label><select id="tRunnerHandling"><option value="drop">Drops free</option><option value="robot">Robot picked</option><option value="unknown">Unknown</option></select></div>
 </div>
 
-<h3 class="section-title" style="margin-top:16px">Gate & Processing Temperatures</h3>
+<h3 class="section-title" style="margin-top:16px">Processing Assumptions</h3>
 <div class="grid">
-<div><label for="tGateType">Gate type</label><select id="tGateType"><option value="round">Round / pin / subgate</option><option value="edge">Edge gate</option><option value="hot">Hot tip / direct hot gate</option></select></div>
-<div><label for="tGateSize">Gate thickness / diameter (mm)</label><input id="tGateSize" type="number" min="0" step="0.01" inputmode="decimal"><span id="tGateHint" class="hint"></span></div>
 <div><label for="tMeltTemp">Melt temperature (°C)</label><input id="tMeltTemp" type="number" step="1" inputmode="decimal"></div>
 <div><label for="tMoldTemp">Mold temperature (°C)</label><input id="tMoldTemp" type="number" step="1" inputmode="decimal"></div>
 <div><label for="tEjectTemp">Ejection temperature (°C)</label><input id="tEjectTemp" type="number" step="1" inputmode="decimal"><span class="hint">Approximate family default; editable.</span></div>
 <div><label for="tAlpha">Thermal diffusivity (mm²/s)</label><input id="tAlpha" type="number" min="0.01" step="0.001" inputmode="decimal"><span class="hint">Approximate material-family default; editable.</span></div>
 </div>
 
-<h3 class="section-title" style="margin-top:16px">Part / Insert Handling</h3>
+<h3 class="section-title" style="margin-top:16px">Handling</h3>
 <div class="grid">
 <div><label for="tInsert">Over-molded metal component inserted?</label><select id="tInsert"><option value="no">No</option><option value="yes">Yes</option></select></div>
 <div><label for="tPartHandling">Finished molded part</label><select id="tPartHandling"><option value="drop">Drops free</option><option value="robot">Robot picked</option></select></div>
@@ -119,11 +120,11 @@ input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--
 <h2 class="section-title">Estimated Cycle Breakdown</h2>
 <div class="results">
 <div class="result"><div class="label">Part Cooling</div><div id="tCooling" class="value">—</div></div>
-<div class="result"><div class="label">Runner Cooling Check</div><div id="tRunnerCooling" class="value">—</div></div>
+<div class="result"><div class="label">Runner / Sprue Cooling Check</div><div id="tRunnerCooling" class="value">—</div></div>
 <div class="result"><div class="label">Fill + Pack/Hold</div><div id="tFillEst" class="value">—</div></div>
-<div class="result"><div class="label">Mold Motion / Handling</div><div id="tMotionEst" class="value">—</div></div>
-<div class="result"><div class="label">Opening Stroke Used</div><div id="tStrokeOut" class="value">—</div></div>
-<div class="result"><div class="label">Estimated Gate Size</div><div id="tGateOut" class="value">—</div></div>
+<div class="result"><div class="label">Open / Eject / Close / Handling</div><div id="tMotionEst" class="value">—</div></div>
+<div class="result"><div class="label">Estimated Opening Clearance</div><div id="tStrokeOut" class="value">—</div></div>
+<div class="result"><div class="label">Internal Gate Scale Estimate</div><div id="tGateOut" class="value">—</div></div>
 <div class="result"><div class="label">Physics / Geometry Baseline</div><div id="tBaseline" class="value">—</div></div>
 <div class="result emphasis"><div class="label">BRI-Calibrated Estimate</div><div id="tCycle" class="value">—</div></div>
 <div class="result warn full"><div class="label">Suggested Range</div><div id="tRange" class="value">—</div></div>
@@ -138,7 +139,7 @@ input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--
 <div><label for="tCompareCycle">Known cycle (sec)</label><input id="tCompareCycle" type="number" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 43"></div>
 <div><label for="tCompareSimilarity">How similar is it?</label><select id="tCompareSimilarity"><option value="high">Very similar</option><option value="medium" selected>Somewhat similar</option><option value="low">Loose comparison</option></select></div>
 </div>
-<p class="note">This comparison adjusts the current estimate only. It does not permanently teach the app unless you save an actual reference job below.</p>
+<p class="note">This adjusts the current estimate only. It becomes permanent reference data only if you save the current setup below.</p>
 </div>
 
 <div class="card">
@@ -150,11 +151,11 @@ input,select{width:100%;font-size:1rem;padding:12px 11px;border:1px solid var(--
 <div class="actions"><button id="tSaveRef" type="button" style="background:var(--accent);color:#fff">Save Current Setup</button><button id="tClearRefs" class="secondary" type="button">Clear All References</button></div>
 <div id="tRefStatus" class="hint" style="margin-top:8px"></div>
 <div id="tRefList" class="ref-list"></div>
-<p class="note">Saved references stay on this browser/device. The calibration weights references by material family, wall thickness, resin volume, mold size/opening, runner type, insert use, and part handling.</p>
+<p class="note">Saved references stay on this browser/device. The calibration weights references by material family, wall thickness, resin volume, part shut height, feed-system concept, insert use, and part handling.</p>
 </div>
 
 <div class="card">
-<p class="note"><strong>Model basis:</strong> cooling uses a one-dimensional heat-transfer estimate using wall thickness, thermal diffusivity, and melt/mold/ejection temperatures. Fill/pack is estimated from shot volume and gate size. Mold motion uses shut height, opening stroke, and handling choices. These are quoting estimates—not a substitute for Moldflow or a molding trial.</p>
+<p class="note"><strong>Quote-stage model:</strong> this intentionally avoids mold-specific inputs that are not yet known. Part shut height is used to estimate the clearance needed to open the mold, and feed-system concepts are handled broadly without requiring a final gate design.</p>
 </div>
 </section>
 
@@ -270,9 +271,9 @@ function clamp(){warn('cWarning','');const a=in2(num('cArea'),q('cAreaUnit').val
 q('cManualToggle').addEventListener('change',()=>{q('cManualBox').classList.toggle('hidden',!q('cManualToggle').checked);clamp()});
 ['cArea','cCav','cRunnerArea','cSafety','cPress','cManualFactor'].forEach(id=>q(id).addEventListener('input',clamp));['cAreaUnit','cRunnerAreaUnit'].forEach(id=>q(id).addEventListener('change',clamp));q('cMaterial').addEventListener('change',clampHint);q('cReset').addEventListener('click',()=>{q('cMaterial').value='PP — Unfilled';q('cArea').value='';q('cAreaUnit').value='in2';q('cCav').value='';q('cRunnerArea').value='';q('cRunnerAreaUnit').value='in2';q('cSafety').value='10';q('cPress').value='';q('cManualToggle').checked=false;q('cManualBox').classList.add('hidden');q('cManualFactor').value='';clampHint();save()});
 
+
 function dimToMm(v,u){return u==='in'?v*25.4:v}
 function volToCm3(v,u){return u==='in3'?v*16.387064:v}
-function moldDimToMm(v,u){return u==='in'?v*25.4:v}
 
 function cycleMaterialDefaults(apply=true){
   const m=materials[q('tMaterial').value];
@@ -283,61 +284,49 @@ function cycleMaterialDefaults(apply=true){
     q('tEjectTemp').value=m.eject;
     q('tAlpha').value=m.alpha;
   }
-  updateGateEstimate(false);
   cycle();
 }
 
-function estimatedGateMm(){
+function internalGateScaleMm(){
   const wall=mm(num('tWall'),q('tWallUnit').value);
   if(!wall) return 0;
-  const type=q('tGateType').value;
-  if(type==='edge') return Math.max(0.6,wall*0.60);
-  if(type==='hot') return Math.max(0.8,wall*0.70);
-  return Math.max(0.5,wall*0.50);
-}
-
-function updateGateEstimate(force=true){
-  const est=estimatedGateMm();
-  if(est){
-    q('tGateHint').textContent=`Starting estimate: ${est.toFixed(2)} mm from wall thickness; override if actual gate is known.`;
-    if(force || !num('tGateSize')) q('tGateSize').value=est.toFixed(2);
-  }else{
-    q('tGateHint').textContent='Enter wall thickness to estimate gate size.';
-  }
+  const feed=q('tFeedConcept').value;
+  if(feed==='valve_direct') return Math.max(0.8,wall*0.80);
+  if(feed==='hot_direct') return Math.max(0.7,wall*0.65);
+  if(feed==='hot_cold' || feed==='cold_runner') return Math.max(0.5,wall*0.55);
+  return Math.max(0.6,wall*0.60);
 }
 
 function coolingTime(thicknessMm, alpha, melt, mold, eject){
   if(thicknessMm<=0 || alpha<=0) return 0;
   const numerator=(8/Math.PI**2)*(melt-mold);
   const denominator=(eject-mold);
-  if(numerator<=0 || denominator<=0 || numerator/denominator<=1) {
+  if(numerator<=0 || denominator<=0 || numerator/denominator<=1){
     return (thicknessMm*thicknessMm)/(Math.PI**2*alpha)*1.8;
   }
   return (thicknessMm*thicknessMm)/(Math.PI**2*alpha)*Math.log(numerator/denominator);
 }
 
-function estimateOpeningStrokeMm(){
-  const explicit=num('tOpenStroke');
-  if(explicit>0) return moldDimToMm(explicit,q('tMoldDimUnit').value);
-  const h=dimToMm(num('tHei'),q('tDimUnit').value);
-  if(!h) return 0;
-  // clearance allowance differs for free drop vs robot entry
-  const clearance=q('tPartHandling').value==='robot' ? Math.max(100,h*1.35) : Math.max(50,h*0.75);
-  return h+clearance;
+function estimatedOpenClearanceMm(){
+  const shut=dimToMm(num('tShut'),q('tDimUnit').value);
+  if(!shut) return 0;
+  if(q('tPartHandling').value==='robot'){
+    return shut + Math.max(100, shut*1.25);
+  }
+  return shut + Math.max(50, shut*0.65);
 }
 
 function estimateMotionSeconds(){
   if(q('tAdvancedOverride').checked) return num('tMotionOverride');
-  const shut=moldDimToMm(num('tShutHeight'),q('tMoldDimUnit').value);
-  const stroke=estimateOpeningStrokeMm();
-  // Mold size and stroke affect acceleration/deceleration and open/close travel.
-  let motion=2.2;
-  if(stroke>0) motion += stroke/180;
-  if(shut>0) motion += Math.min(1.8,shut/500);
+  const clearance=estimatedOpenClearanceMm();
+  let motion=2.0;
+  if(clearance>0) motion += clearance/180;
   motion += 0.7; // eject event
   if(q('tPartHandling').value==='robot') motion += 1.0;
   if(q('tInsert').value==='yes') motion += 2.5;
-  if(q('tRunnerType').value==='cold' && q('tRunnerHandling').value==='robot') motion += 0.5;
+
+  const feed=q('tFeedConcept').value;
+  if((feed==='hot_cold' || feed==='cold_runner') && q('tRunnerHandling').value==='robot') motion += 0.5;
   return motion;
 }
 
@@ -345,17 +334,46 @@ function estimateFillHoldSeconds(){
   if(q('tAdvancedOverride').checked) return num('tFillOverride');
   const vol=volToCm3(num('tVolume'),q('tVolumeUnit').value);
   const cav=Math.max(1,num('tCav'));
-  const gate=Math.max(0.5,num('tGateSize')||estimatedGateMm());
+  const gate=Math.max(0.5,internalGateScaleMm());
   const m=materials[q('tMaterial').value];
+  const feed=q('tFeedConcept').value;
+
   if(!vol){
-    return 3.0*m.visc;
+    let base=3.0*m.visc;
+    if(feed==='valve_direct') base*=0.90;
+    if(feed==='cold_runner') base*=1.10;
+    if(feed==='unknown') base*=1.05;
+    return base;
   }
+
   const shotVol=vol*cav;
-  // broad quoting estimate: larger shot and higher viscosity add fill time;
-  // larger gate reduces it. Hold portion increases modestly with gate size.
-  const fill=Math.max(0.5,(0.45+shotVol/180)*m.visc*(1.2/Math.sqrt(gate)));
-  const hold=Math.max(0.8,0.7+gate*0.9);
+  let fill=Math.max(0.5,(0.45+shotVol/180)*m.visc*(1.2/Math.sqrt(gate)));
+  let hold=Math.max(0.8,0.7+gate*0.9);
+
+  if(feed==='valve_direct'){
+    fill*=0.95;
+    hold*=0.80;
+  }else if(feed==='hot_direct'){
+    hold*=0.90;
+  }else if(feed==='hot_cold'){
+    fill*=1.05;
+  }else if(feed==='cold_runner'){
+    fill*=1.10;
+  }else{
+    fill*=1.05;
+    hold*=1.05;
+  }
   return fill+hold;
+}
+
+function estimatedRunnerDiameterMm(){
+  const known=num('tRunnerDia');
+  if(known>0) return known;
+  const wall=mm(num('tWall'),q('tWallUnit').value);
+  if(!wall) return 0;
+  const feed=q('tFeedConcept').value;
+  if(feed==='cold_runner' || feed==='hot_cold') return Math.max(4.0, wall*1.8);
+  return 0;
 }
 
 function currentCycleSignature(){
@@ -366,11 +384,9 @@ function currentCycleSignature(){
     volume:volToCm3(num('tVolume'),q('tVolumeUnit').value),
     length:dimToMm(num('tLen'),q('tDimUnit').value),
     width:dimToMm(num('tWid'),q('tDimUnit').value),
-    height:dimToMm(num('tHei'),q('tDimUnit').value),
-    shut:moldDimToMm(num('tShutHeight'),q('tMoldDimUnit').value),
-    stroke:estimateOpeningStrokeMm(),
+    shut:dimToMm(num('tShut'),q('tDimUnit').value),
     cav:Math.max(1,num('tCav')),
-    runner:q('tRunnerType').value,
+    feed:q('tFeedConcept').value,
     insert:q('tInsert').value,
     handling:q('tPartHandling').value
   };
@@ -379,7 +395,8 @@ function currentCycleSignature(){
 function refWeight(ref,cur){
   let w=0;
   if(ref.family===cur.family) w+=5;
-  else if((ref.family||'').split('-')[0] === (cur.family||'').split('-')[0]) w+=2;
+  else if((ref.family||'').split('-')[0]===(cur.family||'').split('-')[0]) w+=2;
+
   if(ref.wall>0 && cur.wall>0){
     const ratio=Math.min(ref.wall,cur.wall)/Math.max(ref.wall,cur.wall);
     w+=4*ratio;
@@ -390,13 +407,9 @@ function refWeight(ref,cur){
   }
   if(ref.shut>0 && cur.shut>0){
     const ratio=Math.min(ref.shut,cur.shut)/Math.max(ref.shut,cur.shut);
-    w+=1.5*ratio;
+    w+=2*ratio;
   }
-  if(ref.stroke>0 && cur.stroke>0){
-    const ratio=Math.min(ref.stroke,cur.stroke)/Math.max(ref.stroke,cur.stroke);
-    w+=1.5*ratio;
-  }
-  if(ref.runner===cur.runner) w+=1;
+  if(ref.feed===cur.feed) w+=1.5;
   if(ref.insert===cur.insert) w+=1;
   if(ref.handling===cur.handling) w+=1;
   if(ref.cav===cur.cav) w+=0.5;
@@ -404,22 +417,24 @@ function refWeight(ref,cur){
 }
 
 function getRefs(){
-  try{return JSON.parse(localStorage.getItem('cycleRefsV4')||'[]')}catch{return[]}
+  try{return JSON.parse(localStorage.getItem('cycleRefsV5')||localStorage.getItem('cycleRefsV4')||'[]')}catch{return[]}
 }
-function setRefs(r){localStorage.setItem('cycleRefsV4',JSON.stringify(r));renderRefs()}
+function setRefs(r){localStorage.setItem('cycleRefsV5',JSON.stringify(r));renderRefs()}
 
 function calibratedCycle(base){
-  let estimates=[{value:base,weight:6,source:'baseline'}];
+  let estimates=[{value:base,weight:6}];
   const cur=currentCycleSignature();
   const refs=getRefs().map(r=>({r,w:refWeight(r,cur)})).filter(x=>x.w>=5).sort((a,b)=>b.w-a.w).slice(0,5);
-  refs.forEach(x=>estimates.push({value:x.r.actual,weight:x.w,source:'reference'}));
+  refs.forEach(x=>estimates.push({value:x.r.actual,weight:x.w}));
+
   if(q('tCompareToggle').checked && num('tCompareCycle')>0){
     const factor={high:8,medium:4,low:2}[q('tCompareSimilarity').value]||4;
-    estimates.push({value:num('tCompareCycle'),weight:factor,source:'comparison'});
+    estimates.push({value:num('tCompareCycle'),weight:factor});
   }
+
   const totalW=estimates.reduce((s,x)=>s+x.weight,0);
   const value=estimates.reduce((s,x)=>s+x.value*x.weight,0)/totalW;
-  return {value, refsUsed:refs.length};
+  return {value,refsUsed:refs.length};
 }
 
 function cycle(){
@@ -430,6 +445,7 @@ function cycle(){
     q('tConfidence').textContent='Enter material and wall thickness to start.';
     return;
   }
+
   const melt=num('tMeltTemp'), mold=num('tMoldTemp'), eject=num('tEjectTemp'), alpha=num('tAlpha');
   if(alpha<=0 || melt<=mold || eject<=mold || eject>=melt){
     warn('tWarning','Check temperature and thermal-diffusivity values: melt > ejection > mold is expected for this estimator.');
@@ -437,10 +453,14 @@ function cycle(){
   }
 
   const partCool=Math.max(0.2,coolingTime(wall,alpha,melt,mold,eject));
+
+  const feed=q('tFeedConcept').value;
   let runnerCool=0;
-  if(q('tRunnerType').value==='cold' && num('tRunnerDia')>0){
-    runnerCool=Math.max(0.2,coolingTime(num('tRunnerDia'),alpha,melt,mold,eject));
+  if(feed==='hot_cold' || feed==='cold_runner'){
+    const runnerDia=estimatedRunnerDiameterMm();
+    if(runnerDia>0) runnerCool=Math.max(0.2,coolingTime(runnerDia,alpha,melt,mold,eject));
   }
+
   const controllingCool=Math.max(partCool,runnerCool);
   const fillHold=estimateFillHoldSeconds();
   const motion=estimateMotionSeconds();
@@ -448,52 +468,56 @@ function cycle(){
   const cal=calibratedCycle(baseline);
   const adjusted=cal.value;
 
-  let uncertainty=0.18;
+  let uncertainty=0.20;
   if(num('tVolume')>0) uncertainty-=0.03;
-  if(num('tShutHeight')>0) uncertainty-=0.02;
-  if(num('tOpenStroke')>0) uncertainty-=0.02;
+  if(num('tShut')>0) uncertainty-=0.03;
+  if(feed!=='unknown') uncertainty-=0.02;
   if(cal.refsUsed>=1) uncertainty-=0.03;
   if(cal.refsUsed>=3) uncertainty-=0.03;
   uncertainty=Math.max(0.08,uncertainty);
 
-  const stroke=estimateOpeningStrokeMm();
-  const strokeUnit=q('tMoldDimUnit').value;
-  const strokeDisplay=strokeUnit==='in' ? stroke/25.4 : stroke;
+  const clearance=estimatedOpenClearanceMm();
+  const dimUnit=q('tDimUnit').value;
+  const clearanceDisplay=dimUnit==='in'?clearance/25.4:clearance;
 
   set('tCooling',fmt1.format(partCool)+' sec');
-  set('tRunnerCooling',runnerCool>0 ? fmt1.format(runnerCool)+' sec' : 'N/A');
+  set('tRunnerCooling',runnerCool>0?fmt1.format(runnerCool)+' sec':'N/A');
   set('tFillEst',fmt1.format(fillHold)+' sec');
   set('tMotionEst',fmt1.format(motion)+' sec');
-  set('tStrokeOut',stroke>0 ? fmt1.format(strokeDisplay)+' '+strokeUnit : '—');
-  set('tGateOut',fmt2.format(num('tGateSize')||estimatedGateMm())+' mm');
+  set('tStrokeOut',clearance>0?fmt1.format(clearanceDisplay)+' '+dimUnit:'—');
+  set('tGateOut',fmt2.format(internalGateScaleMm())+' mm');
   set('tBaseline',fmt1.format(baseline)+' sec');
   set('tCycle',fmt1.format(adjusted)+' sec');
   set('tRange',`${fmt1.format(adjusted*(1-uncertainty))}–${fmt1.format(adjusted*(1+uncertainty))} sec`);
 
   let confidence='Low';
-  if(num('tVolume')>0 && num('tShutHeight')>0) confidence='Medium';
-  if(cal.refsUsed>=2 && num('tVolume')>0 && num('tShutHeight')>0) confidence='High';
+  if(num('tVolume')>0 && num('tShut')>0 && feed!=='unknown') confidence='Medium';
+  if(cal.refsUsed>=2 && num('tVolume')>0 && num('tShut')>0) confidence='High';
   q('tConfidence').textContent=`Confidence: ${confidence}. ${cal.refsUsed} saved comparable reference job${cal.refsUsed===1?'':'s'} used.`;
   save();
 }
 
 q('tMaterial').addEventListener('change',()=>cycleMaterialDefaults(true));
-q('tWall').addEventListener('input',()=>{updateGateEstimate(false);cycle()});
-q('tWallUnit').addEventListener('change',()=>{updateGateEstimate(false);cycle()});
-q('tGateType').addEventListener('change',()=>{updateGateEstimate(true);cycle()});
-q('tRunnerType').addEventListener('change',()=>{q('tColdRunnerBox').classList.toggle('hidden',q('tRunnerType').value!=='cold');cycle()});
+q('tWall').addEventListener('input',cycle);
+q('tWallUnit').addEventListener('change',cycle);
+q('tFeedConcept').addEventListener('change',()=>{
+  const cold=['hot_cold','cold_runner'].includes(q('tFeedConcept').value);
+  q('tColdRunnerBox').classList.toggle('hidden',!cold);
+  cycle();
+});
 q('tAdvancedOverride').addEventListener('change',()=>{q('tOverrideBox').classList.toggle('hidden',!q('tAdvancedOverride').checked);cycle()});
 q('tCompareToggle').addEventListener('change',()=>{q('tCompareBox').classList.toggle('hidden',!q('tCompareToggle').checked);cycle()});
 
-['tLen','tWid','tHei','tVolume','tCav','tRunnerDia','tGateSize','tMeltTemp','tMoldTemp','tEjectTemp','tAlpha','tShutHeight','tOpenStroke','tFillOverride','tMotionOverride','tCompareCycle'].forEach(id=>q(id).addEventListener('input',cycle));
-['tDimUnit','tVolumeUnit','tMoldDimUnit','tRunnerHandling','tInsert','tPartHandling','tCompareSimilarity'].forEach(id=>q(id).addEventListener('change',cycle));
+['tLen','tWid','tShut','tVolume','tCav','tRunnerDia','tMeltTemp','tMoldTemp','tEjectTemp','tAlpha','tFillOverride','tMotionOverride','tCompareCycle'].forEach(id=>q(id).addEventListener('input',cycle));
+['tDimUnit','tVolumeUnit','tRunnerHandling','tInsert','tPartHandling','tCompareSimilarity'].forEach(id=>q(id).addEventListener('change',cycle));
 
 q('tReset').addEventListener('click',()=>{
   q('tMaterial').value='PP — Unfilled';q('tWall').value='';q('tWallUnit').value='mm';
-  ['tLen','tWid','tHei','tVolume','tShutHeight','tOpenStroke','tRunnerDia','tCompareCycle','tActualCycle','tRefName','tFillOverride','tMotionOverride'].forEach(id=>q(id).value='');
-  q('tDimUnit').value='mm';q('tVolumeUnit').value='cm3';q('tMoldDimUnit').value='in';q('tCav').value='1';
-  q('tRunnerType').value='hot';q('tColdRunnerBox').classList.add('hidden');q('tGateType').value='round';
-  q('tInsert').value='no';q('tPartHandling').value='drop';q('tAdvancedOverride').checked=false;q('tOverrideBox').classList.add('hidden');
+  ['tLen','tWid','tShut','tVolume','tRunnerDia','tCompareCycle','tActualCycle','tRefName','tFillOverride','tMotionOverride'].forEach(id=>q(id).value='');
+  q('tDimUnit').value='mm';q('tVolumeUnit').value='cm3';q('tCav').value='1';
+  q('tFeedConcept').value='valve_direct';q('tColdRunnerBox').classList.add('hidden');
+  q('tInsert').value='no';q('tPartHandling').value='drop';
+  q('tAdvancedOverride').checked=false;q('tOverrideBox').classList.add('hidden');
   q('tCompareToggle').checked=false;q('tCompareBox').classList.add('hidden');
   cycleMaterialDefaults(true);save();
 });
@@ -510,16 +534,18 @@ q('tSaveRef').addEventListener('click',()=>{
 });
 
 q('tClearRefs').addEventListener('click',()=>{
-  if(confirm('Clear all saved cycle-time reference jobs on this device?')){setRefs([]);q('tRefStatus').textContent='Reference jobs cleared.';cycle()}
+  if(confirm('Clear all saved cycle-time reference jobs on this device?')){
+    setRefs([]);q('tRefStatus').textContent='Reference jobs cleared.';cycle();
+  }
 });
 
 function renderRefs(){
   const box=q('tRefList');box.innerHTML='';
   const refs=getRefs();
   if(!refs.length){box.innerHTML='<div class="muted">No saved reference jobs yet.</div>';return}
-  refs.slice(0,8).forEach((r,i)=>{
+  refs.slice(0,8).forEach(r=>{
     const div=document.createElement('div');div.className='ref-item';
-    div.innerHTML=`<strong>${r.name}</strong> — ${fmt1.format(r.actual)} sec<br><span class="muted">${r.material}; wall ${fmt2.format(r.wall)} mm; volume ${r.volume?fmt1.format(r.volume)+' cm³':'—'}; shut height ${r.shut?fmt1.format(r.shut/25.4)+' in':'—'}; ${r.runner}; ${r.handling==='robot'?'robot pick':'free drop'}${r.insert==='yes'?'; insert overmold':''}</span>`;
+    div.innerHTML=`<strong>${r.name}</strong> — ${fmt1.format(r.actual)} sec<br><span class="muted">${r.material}; wall ${fmt2.format(r.wall)} mm; volume ${r.volume?fmt1.format(r.volume)+' cm³':'—'}; part shut ${r.shut?fmt1.format(r.shut)+' mm':'—'}; ${r.feed||'legacy feed setup'}; ${r.handling==='robot'?'robot pick':'free drop'}${r.insert==='yes'?'; insert overmold':''}</span>`;
     box.appendChild(div);
   });
 }
@@ -602,10 +628,10 @@ q('rTargetPct').addEventListener('change',()=>{
 q('rTargetUnit').addEventListener('change',runnerTarget);
 q('rTargetReset').addEventListener('click',()=>{q('rTargetPart').value='';q('rTargetCav').value='';q('rTargetPct').value='20';q('rCustomPct').value='';q('rCustomPctBox').classList.add('hidden');runnerTarget();save()});
 
-const fields=['pCycle','pCav','pPartMass','pRunnerMass','cMaterial','cArea','cAreaUnit','cCav','cRunnerArea','cRunnerAreaUnit','cSafety','cPress','cManualFactor','tMaterial','tWall','tWallUnit','tLen','tWid','tHei','tDimUnit','tVolume','tVolumeUnit','tCav','tRunnerType','tRunnerDia','tRunnerHandling','tGateType','tGateSize','tMeltTemp','tMoldTemp','tEjectTemp','tAlpha','tShutHeight','tMoldDimUnit','tOpenStroke','tInsert','tPartHandling','tFillOverride','tMotionOverride','tCompareCycle','tCompareSimilarity','aPan','aPanParts','aPanAsh','rKnownUnit','rKnownPart','rKnownCav','rKnownRunner','rTargetUnit','rTargetPart','rTargetCav','rTargetPct','rCustomPct'];
-function save(){const d={};fields.forEach(id=>d[id]=q(id).value);d.cManualToggle=q('cManualToggle').checked;d.runnerMode=q('rModeTarget').checked?'target':'known';d.tAdvancedOverride=q('tAdvancedOverride').checked;d.tCompareToggle=q('tCompareToggle').checked;localStorage.setItem('moldingCalcV4',JSON.stringify(d))}
-function restore(){try{let raw=localStorage.getItem('moldingCalcV4');if(!raw)raw=localStorage.getItem('moldingCalcV3');if(!raw)raw=localStorage.getItem('moldingCalcV2');const d=JSON.parse(raw||'{}');fields.forEach(id=>{if(d[id]!==undefined)q(id).value=d[id]});if(d.cManualToggle!==undefined){q('cManualToggle').checked=!!d.cManualToggle;q('cManualBox').classList.toggle('hidden',!q('cManualToggle').checked)}if(d.runnerMode==='target')q('rModeTarget').checked=true;else q('rModeKnown').checked=true;q('rCustomPctBox').classList.toggle('hidden',q('rTargetPct').value!=='custom');q('tAdvancedOverride').checked=!!d.tAdvancedOverride;q('tOverrideBox').classList.toggle('hidden',!q('tAdvancedOverride').checked);q('tCompareToggle').checked=!!d.tCompareToggle;q('tCompareBox').classList.toggle('hidden',!q('tCompareToggle').checked)}catch{}}
-restore();clampHint();cycleMaterialDefaults(false);if(!q('tMeltTemp').value||!q('tAlpha').value)cycleMaterialDefaults(true);q('tColdRunnerBox').classList.toggle('hidden',q('tRunnerType').value!=='cold');updateGateEstimate(false);prod();clamp();cycle();ash();runnerMode();runnerKnown();runnerTarget();renderRefs();
+const fields=['pCycle','pCav','pPartMass','pRunnerMass','cMaterial','cArea','cAreaUnit','cCav','cRunnerArea','cRunnerAreaUnit','cSafety','cPress','cManualFactor','tMaterial','tWall','tWallUnit','tLen','tWid','tShut','tDimUnit','tVolume','tVolumeUnit','tCav','tFeedConcept','tRunnerDia','tRunnerHandling','tMeltTemp','tMoldTemp','tEjectTemp','tAlpha','tInsert','tPartHandling','tFillOverride','tMotionOverride','tCompareCycle','tCompareSimilarity','aPan','aPanParts','aPanAsh','rKnownUnit','rKnownPart','rKnownCav','rKnownRunner','rTargetUnit','rTargetPart','rTargetCav','rTargetPct','rCustomPct'];
+function save(){const d={};fields.forEach(id=>d[id]=q(id).value);d.cManualToggle=q('cManualToggle').checked;d.runnerMode=q('rModeTarget').checked?'target':'known';d.tAdvancedOverride=q('tAdvancedOverride').checked;d.tCompareToggle=q('tCompareToggle').checked;localStorage.setItem('moldingCalcV5',JSON.stringify(d))}
+function restore(){try{let raw=localStorage.getItem('moldingCalcV5');if(!raw)raw=localStorage.getItem('moldingCalcV4');if(!raw)raw=localStorage.getItem('moldingCalcV3');if(!raw)raw=localStorage.getItem('moldingCalcV2');const d=JSON.parse(raw||'{}');fields.forEach(id=>{if(d[id]!==undefined)q(id).value=d[id]});if(d.cManualToggle!==undefined){q('cManualToggle').checked=!!d.cManualToggle;q('cManualBox').classList.toggle('hidden',!q('cManualToggle').checked)}if(d.runnerMode==='target')q('rModeTarget').checked=true;else q('rModeKnown').checked=true;q('rCustomPctBox').classList.toggle('hidden',q('rTargetPct').value!=='custom');q('tAdvancedOverride').checked=!!d.tAdvancedOverride;q('tOverrideBox').classList.toggle('hidden',!q('tAdvancedOverride').checked);q('tCompareToggle').checked=!!d.tCompareToggle;q('tCompareBox').classList.toggle('hidden',!q('tCompareToggle').checked)}catch{}}
+restore();clampHint();cycleMaterialDefaults(false);if(!q('tMeltTemp').value||!q('tAlpha').value)cycleMaterialDefaults(true);q('tColdRunnerBox').classList.toggle('hidden',!['hot_cold','cold_runner'].includes(q('tFeedConcept').value));prod();clamp();cycle();ash();runnerMode();runnerKnown();runnerTarget();renderRefs();
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'));
 </script>
 </body></html>
